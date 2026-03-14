@@ -1,16 +1,34 @@
-# React + Vite
+# VaultAI: ML-Driven DeFi Wallet for Automated Yield Optimization
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**T63-6th-sem-project**  
+*This Repository contains tasks for our 6th semester mini project. Synopsis hardcopy is submitted and has been signed by our mentor!*
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 1. Introduction
+Decentralized finance (DeFi) offers high yield opportunities but requires constant monitoring and expertise. Most users struggle to manage risk and optimize returns. VaultAI is an intelligent DeFi wallet that automatically optimizes asset allocation and yield strategies using machine learning.
 
-## React Compiler
+## 2. Problem Statement
+DeFi users face high complexity, rapid market changes, manual strategy management, and the risk of suboptimal allocation.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 3. Proposed Solution
+VaultAI continuously analyzes market conditions, protocols, and risk metrics to automatically rebalance assets and optimize yield strategies.
 
-## Expanding the ESLint configuration
+## 4. Key Objectives
+- Maximize DeFi yield safely
+- Automate portfolio management
+- Reduce user complexity
+- Adapt to market volatility
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 5. Key Features
+- **Yield Analytics Engine:** Tracks protocol performance.
+- **ML-Based Allocation Model:** Optimizes asset distribution.
+- **Risk Scoring Framework:** Balances yield with safety.
+- **Automated Rebalancing:** Executes strategy adjustments.
+- **User Transparency Dashboard:** Explains decisions clearly.
+
+## 6. Real-Time Use Case
+When yield conditions change, VaultAI automatically reallocates funds to maintain optimal returns without user intervention.
+
+## 7. Conclusion
+VaultAI democratizes DeFi investing by combining automation, intelligence, and risk awareness in one wallet.
