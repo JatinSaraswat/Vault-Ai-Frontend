@@ -146,3 +146,5 @@ export default function Profile() {
     </div>
   );
 }
+
+// Performance Tracking Layer
