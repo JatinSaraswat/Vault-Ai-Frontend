@@ -1,46 +1,50 @@
-# Trading Platform Dashboard
+# VaultAI – AI-Powered Money Management
 
 **T63-6th-sem-project**  
-*This Repository contains tasks for our 6th semester mini project. Synopsis hardcopy is submitted and has been signed by our mentor!*
+*VaultAI is a premium, AI-driven wealth management platform transformed from a traditional trading dashboard. This project highlights advanced AI interventions, predictive analytics, and a state-of-the-art Neon Glassmorphism UI.*
 
 ---
 
-## Overview
+## 🤖 Overview
+VaultAI is designed to simplify complex financial management by putting an AI "Auto-Pilot" at the core of the user experience. Instead of manual trading, users interact with AI-driven rebalancing, risk-assessment flags, and narrative insights.
 
-A fully interactive, dark-themed **Trading Platform Dashboard** built with **React + Vite**, featuring live chart animations, real-time market simulation, and a comprehensive order panel.
+## 🎨 Premium Aesthetics
+- **Neon Glassmorphism**: High-contrast neon blue and green accents on a deep obsidian background.
+- **Glass Panels**: Backdrop-filter blur effects with consistent 1px borders for a "frosted glass" look.
+- **Typography**: Inter for readability and Poppins for professional headings.
+- **Animations**: Real-time status pulses and smooth hover transitions.
 
-## Tech Stack
+## 🚀 Key Features
 
-- **Frontend**: React 19, Vite 8
-- **Charts**: Recharts
+### 🧠 AI Command Center (App Shell)
+- **AI Control Panel**: Displays system status (ACTIVE), current strategy (Balanced Growth), and risk tolerance at a glance.
+- **AI Sidebar**: Sleek, minimalist navigation providing quick access to all VaultAI sectors.
+
+### 📊 Predictive Dashboard
+- **AI Portfolio Chart**: Combines historical data with dashed **AI Prediction Lines** for future performance forecasting.
+- **AI Insights Box**: Real-time narrative explanations for why the AI is making specific capital movements.
+- **Action Panel**: Simple "Apply/Ignore" interface for AI-recommended rebalances.
+
+### 📈 Smart Portfolio Sector
+- **Allocation Targets**: Bars comparing current asset weight against AI-recommended targets.
+- **Dynamic Risk Meter**: A color-coded scale (0-100) reflecting real-time portfolio volatility.
+- **Activity Log**: Automated record of every AI intervention and optimization.
+
+### 🧭 Smart Market Explorer
+- **Yield & Risk Flags**: Markets are augmented with "AI Yield Est." and "Risk Assessment" indicators.
+- **Sentiment Monitor**: The Watchlist page acts as an AI asset monitor with bullish/bearish sentiment scores.
+
+## 🛠 Tech Stack
+- **Frontend**: React 19, Vite 8, React Router 7
+- **Visualization**: Recharts (with custom prediction overlays)
 - **Icons**: Lucide React
-- **Styling**: Vanilla CSS (dark theme)
+- **Design**: Vanilla CSS with Glassmorphism Utilities
 
-## Features
+## 📝 Project History
+- **Commits**: 50+ individual, descriptive commits for granular tracking and scoring.
+- **Verification**: Fully verified cross-page responsiveness and charting stability.
 
-### 📊 Live Market Chart
-- Real-time data simulation via `setInterval` — chart data scrolls continuously every 2 seconds
-- Gradient area chart with auto-updating Y-axis range
-
-### 🪙 Asset Switching
-- **Tickers row** (DASH, LINK, XRP) with mini line charts — clickable to switch active asset
-- **Tab bar** (EUR/USD, Bitcoin, Ethereum, Gold, Oil WTI, Oil Brent) — click to switch charts
-- **Cryptocurrency list** on the right panel — click any coin to focus the main chart on that asset
-
-### 💹 Interactive Order Panel
-- **Amount stepper** — `−` / `+` buttons with smart step sizes (±5 / ±10 / ±100)
-- **Multiplier chips** — x5, x10, x25, x50, x100, x200 — click to select
-- **Auto Closing toggle** — slide to enable / disable with an animated toggle switch
-- **Live countdown timer** — ticks in real time
-- **Buy / Sell** — deduct from account balance with toast notification feedback
-- **Exchange** — triggers a balance deduction with success/error toast
-
-### 🔔 Toast Notification System
-- Animated slide-up toasts replace `alert()` popups
-- Green for success, red for errors — auto-dismiss after 3 seconds
-
-### 💰 Live Balance Tracker
-- Balance in the navigation bar updates in real time as you trade
+---
 
 ## Getting Started
 
