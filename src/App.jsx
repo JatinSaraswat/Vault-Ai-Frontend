@@ -3,11 +3,11 @@ import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-ro
 import { 
   Home, List, BarChart2, Star, Search, User, Settings, X, Plus, 
   ArrowUpRight, ArrowDownRight, Target, Clock, ChevronDown, CheckCircle, AlertCircle,
-  Minus
+  Minus, Brain, Zap, Shield, TrendingUp, Info, Activity, Layers, Bell
 } from 'lucide-react';
 import { 
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  LineChart, Line
+  LineChart, Line, PieChart as RePie, Pie, Cell
 } from 'recharts';
 import './index.css';
 import Markets from './pages/Markets.jsx';
@@ -16,552 +16,400 @@ import Watchlist from './pages/Watchlist.jsx';
 import Profile from './pages/Profile.jsx';
 import SettingsPage from './pages/Settings.jsx';
 
-// Base Mock Data
-const generateData = () => Array.from({ length: 40 }, (_, i) => ({
-  time: `${Math.floor(i / 6) + 12}:00`,
-  pv: Math.random() * 2000 + 4000,
-  uv: Math.random() * 1000 + 3000,
-  amt: Math.random() * 2000 + 2000,
-}));
+// Data Generation with Prediction
+const generateData = () => {
+  const base = Array.from({ length: 40 }, (_, i) => ({
+    time: `${Math.floor(i / 6) + 12}:00`,
+    uv: 3000 + Math.random() * 2000,
+    pv: 2000 + Math.random() * 1000,
+    isPrediction: false
+  }));
+  
+  // Add 10 prediction points
+  const lastTime = 18;
+  for (let i = 1; i <= 10; i++) {
+    base.push({
+      time: `${(lastTime + i) % 24}:00`,
+      uv: base[base.length-1].uv + (Math.random() - 0.4) * 400,
+      pv: base[base.length-1].pv + (Math.random() - 0.4) * 200,
+      isPrediction: true
+    });
+  }
+  return base;
+};
 
-const smallAreaChartData = [
-  { pv: 2400 }, { pv: 1398 }, { pv: 9800 }, { pv: 3908 },
-  { pv: 4800 }, { pv: 3800 }, { pv: 4300 }, { pv: 8900 }
-];
+// --- Sub-components ---
 
-const smallAreaChartDataRed = [
-  { pv: 8900 }, { pv: 6398 }, { pv: 7800 }, { pv: 3908 },
-  { pv: 4800 }, { pv: 2800 }, { pv: 4300 }, { pv: 2400 }
-];
-
-const barChartData = [
-  { name: '1', uv: 400, pv: 240, amt: 240 },
-  { name: '2', uv: 300, pv: 139, amt: 221 },
-  { name: '3', uv: 200, pv: 980, amt: 229 },
-  { name: '4', uv: 278, pv: 390, amt: 200 },
-  { name: '5', uv: 189, pv: 480, amt: 218 },
-  { name: '6', uv: 239, pv: 380, amt: 250 },
-  { name: '7', uv: 349, pv: 430, amt: 210 },
-];
-
-const cryptoList = [
-  { symbol: 'ETH', name: 'Ethereum', price: 2308.24, change: '+1.45%', isPos: true },
-  { symbol: 'BTC', name: 'Bitcoin', price: 41509.23, change: '+2.41%', isPos: true },
-  { symbol: 'XRP', name: 'Ripple', price: 0.508, change: '-4.12%', isPos: false },
-  { symbol: 'LTC', name: 'Litecoin', price: 69.72, change: '+1.12%', isPos: true },
-  { symbol: 'BCH', name: 'Bitcoin Cash', price: 268.52, change: '+3.44%', isPos: true },
-  { symbol: 'EOS', name: 'EOS', price: 0.74, change: '+1.11%', isPos: true },
-  { symbol: 'ZEC', name: 'Zcash', price: 28.92, change: '-2.11%', isPos: false },
-  { symbol: 'ZRX', name: '0x', price: 0.328, change: '-4.67%', isPos: false },
-];
-
-// Simple Toast Component
-function Toast({ message, type, onClose }) {
-  useEffect(() => {
-    const t = setTimeout(onClose, 3000);
-    return () => clearTimeout(t);
-  }, [onClose]);
+function Sidebar() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const navItems = [
+    { icon: Home, path: '/', label: 'Vault' },
+    { icon: List, path: '/markets', label: 'Markets' },
+    { icon: BarChart2, path: '/portfolio', label: 'Portfolio' },
+    { icon: Star, path: '/watchlist', label: 'Watchlist' },
+    { icon: User, path: '/profile', label: 'Profile' },
+    { icon: Settings, path: '/settings', label: 'Settings' },
+  ];
 
   return (
-    <div style={{
-      position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)',
-      backgroundColor: 'var(--bg-panel)', borderLeft: `4px solid ${type === 'success' ? 'var(--accent-green)' : 'var(--accent-red)'}`,
-      padding: '12px 24px', borderRadius: '4px', boxShadow: '0 8px 16px rgba(0,0,0,0.5)',
-      display: 'flex', alignItems: 'center', gap: '12px', zIndex: 1000,
-      color: 'white', fontWeight: 'bold', fontSize: '14px', animation: 'slideUp 0.3s ease-out'
-    }}>
-      {type === 'success' ? <CheckCircle color="var(--accent-green)" /> : <AlertCircle color="var(--accent-red)" />}
-      {message}
+    <aside className="sidebar glass-panel">
+      <div className="sidebar-logo">
+        <Brain size={24} color="white" />
+      </div>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '20px' }}>
+        {navItems.map(item => (
+          <div 
+            key={item.path}
+            className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
+            onClick={() => navigate(item.path)}
+            title={item.label}
+          >
+            <item.icon size={20} />
+          </div>
+        ))}
+      </div>
+      <div className="nav-item">
+        <Bell size={20} />
+      </div>
+    </aside>
+  );
+}
+
+function AIControlPanel() {
+  return (
+    <div className="ai-header glass-panel" style={{ padding: '0 20px', marginBottom: '12px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+        <div className="ai-status-pulse">
+          <div className="pulse-dot"></div>
+          <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--accent-green)', letterSpacing: '0.5px' }}>
+            VaultAI: ACTIVE
+          </span>
+        </div>
+        
+        <div style={{ display: 'flex', gap: '20px' }}>
+          <div>
+            <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Strategy</div>
+            <div style={{ fontSize: '13px', fontWeight: '600' }}>Balanced Growth</div>
+          </div>
+          <div style={{ borderLeft: '1px solid var(--border)', paddingLeft: '20px' }}>
+            <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Risk Level</div>
+            <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--accent-orange)' }}>Medium</div>
+          </div>
+          <div style={{ borderLeft: '1px solid var(--border)', paddingLeft: '20px' }}>
+            <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Last Rebalance</div>
+            <div style={{ fontSize: '13px', fontWeight: '600' }}>2 hrs ago</div>
+          </div>
+        </div>
+      </div>
+      
+      <button className="ai-btn-primary hover-glow" style={{ height: '36px', padding: '0 16px', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <Settings size={14} /> Adjust Strategy
+      </button>
     </div>
   );
 }
 
-const MULTIPLIERS = ['x5', 'x10', 'x25', 'x50', 'x100', 'x200'];
+function AIInsightsBox() {
+  return (
+    <div className="ai-card glass-panel" style={{ marginBottom: '12px' }}>
+      <div className="ai-card-title">
+        <Info size={14} color="var(--accent-blue)" /> AI Insight
+      </div>
+      <div className="insight-text">
+        "ETH yield dropped by 3% in Spark Pool. Reallocating 15% of funds to USDC-EURO high-stability vaults to maintain target growth."
+      </div>
+      <div style={{ display: 'flex', gap: '16px', marginTop: '4px' }}>
+        <div className="impact-badge positive">
+          <TrendingUp size={12} /> +1.8% Expected Return
+        </div>
+        <div className="impact-badge positive">
+          <Shield size={12} /> -20% Risk Reduction
+        </div>
+      </div>
+    </div>
+  );
+}
 
-// TopNav component (shared across all pages)
-function TopNav({ balance }) {
-  const navigate = useNavigate();
-  const location = useLocation();
+function AIActionPanel({ onApply }) {
+  return (
+    <div className="ai-card glass-panel" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div className="ai-card-title">
+        <Zap size={14} color="var(--accent-orange)" /> AI Action Panel
+      </div>
+      
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px', justifyContent: 'center' }}>
+        <div style={{ background: 'rgba(0, 210, 255, 0.05)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(0, 210, 255, 0.1)' }}>
+          <div style={{ fontSize: '11px', color: 'var(--accent-blue)', fontWeight: '700', marginBottom: '8px' }}>
+            RECOMMENDATION
+          </div>
+          <div style={{ fontSize: '14px', fontWeight: '500', lineHeight: '1.5' }}>
+            Move 20% funds from <span style={{color: 'var(--accent-red)'}}>XRP</span> → <span style={{color: 'var(--accent-green)'}}>USDT</span>
+          </div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>
+            Reason: High volatility detected in XRP/USD pair.
+          </div>
+        </div>
+        
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <button className="ai-btn-primary" onClick={onApply}>Apply Recommendation</button>
+          <button className="ai-btn-secondary">Ignore Rebalance</button>
+        </div>
+      </div>
+      
+      <div style={{ fontSize: '11px', color: 'var(--text-muted)', textAlign: 'center', marginTop: 'auto' }}>
+        AI confidence: 94.2%
+      </div>
+    </div>
+  );
+}
 
-  const navItems = [
-    { icon: Home, path: '/', title: 'Trading Dashboard' },
-    { icon: List, path: '/markets', title: 'Markets' },
-    { icon: BarChart2, path: '/portfolio', title: 'Portfolio' },
-    { icon: Star, path: '/watchlist', title: 'Watchlist' },
+function SmartMarketPanel() {
+  const items = [
+    { label: 'Top Yield Pools', val: 'ETH Pool → 12.5%', type: 'yield', icon: Layers, color: 'var(--accent-green)' },
+    { label: 'Risk Alert', val: 'XRP volatility high', type: 'risk', icon: AlertCircle, color: 'var(--accent-red)' },
+    { label: 'Trending', val: 'BTC up 3.2%', type: 'trending', icon: TrendingUp, color: 'var(--accent-blue)' },
   ];
 
   return (
-    <header className="top-nav">
-      <div className="nav-left">
-        <div className="brand" onClick={() => navigate('/')} style={{cursor:'pointer'}}>TRADING<br/>PLATFORM</div>
-        <div className="nav-links">
-          {navItems.map(({ icon: Icon, path, title }) => (
-            <div
-              key={path}
-              className={`nav-link ${location.pathname === path ? 'nav-link-active' : ''}`}
-              onClick={() => navigate(path)}
-              title={title}
-            >
-              <Icon size={16} />
+    <div className="ai-card glass-panel" style={{ flex: 1 }}>
+      <div className="ai-card-title">
+        <Activity size={14} color="var(--accent-green)" /> Smart Market Panel
+      </div>
+      <div className="smart-list" style={{ marginTop: '12px' }}>
+        {items.map((item, i) => (
+          <div key={i} className="smart-item">
+            <div className="smart-icon-wrap" style={{ background: `${item.color}20`, color: item.color }}>
+              <item.icon size={16} />
             </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="nav-center">
-        <div className="search-bar">
-          <Search size={16} color="var(--text-muted)" />
-          <input type="text" placeholder="Search markets..." />
-        </div>
-      </div>
-
-      <div className="nav-right">
-        <div
-          className="user-balance hover-effect"
-          style={{ padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}
-          onClick={() => navigate('/portfolio')}
-          title="View Portfolio"
-        >
-          <div style={{ fontSize: '11px' }}>Balance:</div>
-          <div className="balance-amount">
-            ${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            <ChevronDown size={12} display="inline" style={{marginLeft: '4px'}} />
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{item.label}</div>
+              <div style={{ fontSize: '13px', fontWeight: '600' }}>{item.val}</div>
+            </div>
           </div>
-        </div>
-        <div className="user-profile" onClick={() => navigate('/profile')} title="Profile">
-          <User size={20} />
-        </div>
-        <div className="user-profile" onClick={() => navigate('/settings')} title="Settings">
-          <Settings size={18} color="var(--text-muted)" />
-        </div>
+        ))}
       </div>
-    </header>
+    </div>
   );
 }
 
-// The main trading dashboard (Home page)
-function TradingDashboard({ balance, setBalance }) {
-  const [amount, setAmount] = useState(100);
-  const [multiplier, setMultiplier] = useState('x50');
-  const [activeAsset, setActiveAsset] = useState('EUR/USD');
-  const [openingPrice, setOpeningPrice] = useState(1.05);
+// --- Main Pages ---
+
+function VaultDashboard() {
+  const [data, setData] = useState(generateData());
+  const [timeRange, setTimeRange] = useState('24H');
   const [toast, setToast] = useState(null);
-  const [autoClose, setAutoClose] = useState(false);
-  const [countdown, setCountdown] = useState(60 * 60 + 33 * 60 + 16);
-  const [chartData, setChartData] = useState(generateData());
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    const t = setInterval(() => setCountdown(prev => prev > 0 ? prev - 1 : 0), 1000);
-    return () => clearInterval(t);
-  }, []);
-
-  const formatCountdown = (secs) => {
-    const h = Math.floor(secs / 3600);
-    const m = Math.floor((secs % 3600) / 60);
-    const s = secs % 60;
-    return `${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-  };
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setChartData(prevData => {
-        const newData = [...prevData];
-        newData.shift();
-        const lastData = prevData[prevData.length - 1];
-        const randomChangeUV = (Math.random() - 0.5) * 200;
-        const randomChangePV = (Math.random() - 0.5) * 100;
-        const newTime = parseInt(lastData.time.split(':')[0]);
-        const nextTime = newTime >= 23 ? '00:00' : `${newTime + 1}:00`;
-        newData.push({
-          time: nextTime,
-          uv: Math.max(1000, lastData.uv + randomChangeUV),
-          pv: Math.max(1000, lastData.pv + randomChangePV),
-          amt: lastData.amt
-        });
-        return newData;
-      });
-      setOpeningPrice(prev => prev + (Math.random() - 0.5) * (prev * 0.001));
-    }, 2000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const showToast = (message, type = 'success') => setToast({ message, type });
-
-  const handleAssetChange = (assetName, price) => {
-    setActiveAsset(assetName);
-    setOpeningPrice(price);
-    setChartData(generateData());
-  };
-
-  const stepAmount = (dir) => {
-    setAmount(prev => {
-      const val = parseFloat(prev) || 0;
-      const step = val >= 1000 ? 100 : val >= 100 ? 10 : 5;
-      return Math.max(5, val + dir * step);
-    });
-  };
-
-  const handleTrade = (type) => {
-    const numAmount = parseFloat(amount || 0);
-    if (numAmount <= 0) { showToast("Please enter a valid amount", "error"); return; }
-    if (balance >= numAmount) {
-      setBalance(prev => prev - numAmount);
-      showToast(`Successfully ${type} $${numAmount} of ${activeAsset}`);
-    } else {
-      showToast("Insufficient balance for this trade!", "error");
-    }
-  };
-
-  const handleExchange = () => {
-    const numAmount = parseFloat(amount || 0);
-    if (numAmount <= 0) { showToast("Please enter a valid amount", "error"); return; }
-    if (balance >= numAmount) {
-       setBalance(prev => prev - numAmount);
-       showToast(`Exchanged $${numAmount.toFixed(2)} successfully!`);
-    } else {
-       showToast("Insufficient balance to exchange!", "error");
-    }
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
   };
 
   return (
-    <>
-      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-      <div className="main-layout">
-        {/* Left Column */}
-        <div className="left-column">
-          {/* Ticker Row */}
-          <div className="tickers-row">
-            <div className="ticker-card hover-effect" onClick={() => handleAssetChange('DASH', 110.01)}>
-              <div className="ticker-info">
-                <div className="coin-icon" style={{ backgroundColor: '#008de4', color: 'white' }}>D</div>
-                <div>
-                  <div className="ticker-name">DASH</div>
-                  <div className="ticker-symbol">Dash</div>
-                </div>
-              </div>
-              <div className="ticker-chart" style={{ height: '40px', width: '80px' }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={smallAreaChartData}>
-                    <Line type="monotone" dataKey="pv" stroke="#089981" strokeWidth={2} dot={false} isAnimationActive={false} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="ticker-price">
-                <div className="positive">$110.01</div>
-                <div className="ticker-change positive">+1.45% 12h</div>
-              </div>
-            </div>
-
-            <div className="ticker-card hover-effect" onClick={() => handleAssetChange('LINK', 2.23)}>
-              <div className="ticker-info">
-                <div className="coin-icon" style={{ backgroundColor: '#2a5ada', color: 'white' }}>L</div>
-                <div>
-                  <div className="ticker-name">LINK</div>
-                  <div className="ticker-symbol">Chainlink</div>
-                </div>
-              </div>
-              <div className="ticker-chart" style={{ height: '40px', width: '80px' }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={smallAreaChartData}>
-                    <Line type="monotone" dataKey="pv" stroke="#089981" strokeWidth={2} dot={false} isAnimationActive={false} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="ticker-price">
-                <div className="positive">$2.23</div>
-                <div className="ticker-change positive">+3.89% 12h</div>
+    <div className="main-content">
+      {toast && (
+        <div className="glass-panel" style={{ 
+          position: 'fixed', bottom: '24px', right: '24px', padding: '12px 24px', 
+          background: 'var(--accent-blue)', color: 'white', fontWeight: '700', 
+          borderRadius: '12px', boxShadow: '0 8px 32px rgba(0,210,255,0.4)', zIndex: 100 
+        }}>
+          {toast}
+        </div>
+      )}
+      
+      <AIControlPanel />
+      
+      <div className="content-row">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <AIInsightsBox />
+          
+          <div className="glass-panel" style={{ padding: '20px', flex: 1, minHeight: '400px', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <div className="ai-card-title">Portfolio Performance</div>
+              <div className="chart-controls">
+                {['1H', '24H', '7D', '1M'].map(r => (
+                  <button 
+                    key={r} 
+                    className={`chart-ctrl-btn ${timeRange === r ? 'active' : ''}`}
+                    onClick={() => setTimeRange(r)}
+                  >{r}</button>
+                ))}
               </div>
             </div>
-
-            <div className="ticker-card hover-effect" onClick={() => handleAssetChange('XRP', 0.508)}>
-              <div className="ticker-info">
-                <div className="coin-icon" style={{ backgroundColor: '#23292f', color: 'white' }}>X</div>
-                <div>
-                  <div className="ticker-name">XRP</div>
-                  <div className="ticker-symbol">Ripple</div>
-                </div>
+            
+            <div style={{ width: '100%', flex: 1, minHeight: '300px' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={data}>
+                  <defs>
+                    <linearGradient id="mainGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="var(--accent-blue)" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="var(--accent-blue)" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+                  <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{fill: 'var(--text-muted)', fontSize: 10}} />
+                  <YAxis hide domain={['auto', 'auto']} />
+                  <Tooltip 
+                    contentStyle={{ background: 'var(--bg-main)', border: '1px solid var(--border)', borderRadius: '12px', fontSize: '12px' }}
+                    itemStyle={{ color: 'var(--accent-blue)' }}
+                  />
+                  
+                  {/* Main Line */}
+                  <Area 
+                    type="monotone" 
+                    dataKey="uv" 
+                    stroke="var(--accent-blue)" 
+                    strokeWidth={3} 
+                    fill="url(#mainGrad)" 
+                    isAnimationActive={false}
+                  />
+                  
+                  {/* Prediction Line */}
+                  <Area 
+                    type="monotone" 
+                    dataKey="uv" 
+                    data={data.filter((d, i) => i >= data.length - 11)}
+                    stroke="var(--accent-blue)" 
+                    strokeWidth={2}
+                    strokeDasharray="5 5"
+                    fill="none"
+                    isAnimationActive={false}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+            
+            <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--text-muted)' }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent-blue)' }}></div> Actual
               </div>
-              <div className="ticker-chart" style={{ height: '40px', width: '80px' }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={smallAreaChartDataRed}>
-                    <Line type="monotone" dataKey="pv" stroke="#f23645" strokeWidth={2} dot={false} isAnimationActive={false} />
-                  </LineChart>
-                </ResponsiveContainer>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--text-muted)' }}>
+                <div style={{ width: 12, height: 1, borderTop: '2px dashed var(--accent-blue)' }}></div> AI Prediction
               </div>
-              <div className="ticker-price">
-                <div className="negative">$0.508</div>
-                <div className="ticker-change negative">-4.12% 12h</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--accent-green)', marginLeft: 'auto' }}>
+                <Target size={12} /> Rebalanced here 🔄
               </div>
             </div>
           </div>
+        </div>
+        
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <AIActionPanel onApply={() => showToast("Rebalancing sequence initiated...")} />
+          <SmartMarketPanel />
+        </div>
+      </div>
 
-          {/* Main Chart + Order */}
-          <div className="chart-and-order">
-            <div className="main-chart" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-              <div style={{ display: 'flex', gap: '24px', marginBottom: '16px', fontSize: '13px', flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#f23645' }}></div>
-                  <span>{activeAsset}</span>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--text-muted)' }}>Opening Price </span>
-                  <span style={{ color: '#f23645', fontWeight: 'bold' }}>
-                    {openingPrice < 10 ? openingPrice.toFixed(4) : openingPrice.toLocaleString()}
-                  </span>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--text-muted)' }}>Investment </span>
-                  <span style={{ fontWeight: 'bold' }}>${amount || '0'}</span>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--text-muted)' }}>Profit </span>
-                  <span style={{ color: 'var(--accent-green)', fontWeight: 'bold' }}>
-                    +${(parseFloat(amount || 0) * 0.15).toFixed(2)}
-                  </span>
-                </div>
-              </div>
-              <div style={{ flex: 1, minHeight: '350px', width: '100%' }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} animationDuration={400}>
-                    <defs>
-                      <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#2962ff" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#2962ff" stopOpacity={0}/>
-                      </linearGradient>
-                      <pattern id="diagonalHatch" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
-                        <line x1="0" y1="0" x2="0" y2="8" stroke="#10b981" strokeWidth="2" opacity="0.3" />
-                      </pattern>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
-                    <XAxis dataKey="time" stroke="var(--text-muted)" fontSize={11} tickLine={false} axisLine={false} />
-                    <YAxis orientation="right" stroke="var(--text-muted)" fontSize={11} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
-                    <Tooltip contentStyle={{ backgroundColor: 'var(--bg-panel)', borderColor: 'var(--border)', borderRadius: '4px' }} />
-                    <Area type="monotone" dataKey="uv" stroke="#2962ff" strokeWidth={2} fillOpacity={1} fill="url(#colorUv)" isAnimationActive={false} />
-                    <Area type="monotone" dataKey="pv" stroke="none" fill="url(#diagonalHatch)" fillOpacity={1} isAnimationActive={false} />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Order Panel */}
-            <div className="order-panel">
-              <div className="form-group">
-                <label>Amount</label>
-                <div className="amount-stepper">
-                  <button className="stepper-btn" onClick={() => stepAmount(-1)}><Minus size={14}/></button>
-                  <div className="stepper-display">
-                    <span className="stepper-currency">$</span>
-                    <input
-                      type="number"
-                      value={amount}
-                      onChange={e => setAmount(parseFloat(e.target.value) || 0)}
-                      className="stepper-input"
-                    />
-                  </div>
-                  <button className="stepper-btn" onClick={() => stepAmount(1)}><Plus size={14}/></button>
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Multiplier</label>
-                <div className="multiplier-chips">
-                  {MULTIPLIERS.map(m => (
-                    <button
-                      key={m}
-                      className={`chip-btn ${multiplier === m ? 'chip-active' : ''}`}
-                      onClick={() => setMultiplier(m)}
-                    >{m}</button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="form-group">
-                <div className="auto-closing-row">
-                  <label>Auto Closing</label>
-                  <button
-                    className={`toggle-btn ${autoClose ? 'toggle-on' : ''}`}
-                    onClick={() => setAutoClose(p => !p)}
+      <div className="content-row-full" style={{ marginTop: '12px' }}>
+        <div className="glass-panel ai-card">
+          <div className="ai-card-title">Allocation</div>
+          <div style={{ height: '140px', display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <div style={{ width: '120px', height: '120px' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <RePie>
+                  <Pie 
+                    data={[
+                      { name: 'ETH', value: 45, color: 'var(--accent-blue)' },
+                      { name: 'USDT', value: 30, color: 'var(--accent-green)' },
+                      { name: 'BTC', value: 25, color: '#f59e0b' }
+                    ]} 
+                    innerRadius={35} 
+                    outerRadius={50} 
+                    dataKey="value" 
+                    stroke="none"
                   >
-                    <span className="toggle-thumb"/>
-                  </button>
+                    {[0,1,2].map((_, i) => <Cell key={i} fill={['var(--accent-blue)', 'var(--accent-green)', '#f59e0b'][i]} />)}
+                  </Pie>
+                </RePie>
+              </ResponsiveContainer>
+            </div>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div>
+                <div style={{ fontSize: '10px', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between' }}>
+                  <span>Current</span> <span>45%</span>
                 </div>
-                {autoClose && (
-                  <div className="input-box" style={{ marginTop: '6px' }}>
-                    <span style={{color:'var(--text-muted)', fontSize:'12px'}}>Close at profit $</span>
-                    <input type="number" defaultValue="50" className="stepper-input" style={{width:'60px', textAlign:'right'}}/>
-                  </div>
-                )}
+                <div className="risk-meter-container"><div className="risk-meter-fill" style={{ width: '45%', background: 'var(--accent-blue)' }}></div></div>
               </div>
-
-              <div className="countdown-box">
-                <Clock size={14} color="var(--text-muted)"/>
-                <span className="countdown-time">{formatCountdown(countdown)}</span>
-              </div>
-
-              <div className="trade-buttons">
-                <button className="btn-buy interactive-btn" onClick={() => handleTrade('bought')}>
-                  <ArrowDownRight size={22} />
-                  <span>BUY</span>
-                </button>
-                <button className="btn-sell interactive-btn" onClick={() => handleTrade('sold')}>
-                  <ArrowUpRight size={22} />
-                  <span>SELL</span>
-                </button>
-              </div>
-
-              <button className="exchange-btn interactive-btn" onClick={handleExchange}>
-                Exchange
-              </button>
-            </div>
-          </div>
-
-          {/* Quick Tabs row */}
-          <div className="tabs-row" style={{ overflowX: 'auto', paddingBottom: '4px' }}>
-            {['EUR/USD', 'Bitcoin', 'Ethereum', 'Gold', 'Oil WTI', 'Oil Brent'].map(asset => (
-              <div
-                key={asset}
-                className={`tab-item hover-effect ${activeAsset === asset ? 'active' : ''}`}
-                onClick={() => handleAssetChange(asset, asset === 'EUR/USD' ? 1.05 : 23000)}
-              >
-                {activeAsset === asset && <Target size={14} color="#f23645" />}
-                {asset}
-                <X size={14} color="var(--text-muted)" style={{cursor: 'pointer'}} />
-              </div>
-            ))}
-            <div className="tab-item hover-effect" style={{ padding: '12px' }}><Plus size={16} /></div>
-          </div>
-
-          {/* Bottom Stats */}
-          <div className="bottom-stats">
-            <div className="stat-box">
-              <div className="stat-box-title">Volume Overview</div>
-              <div style={{ flex: 1, minHeight: '120px', width: '100%' }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={barChartData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)"/>
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={10} stroke="var(--text-muted)"/>
-                    <YAxis axisLine={false} tickLine={false} fontSize={10} stroke="var(--text-muted)"/>
-                    <defs>
-                      <linearGradient id="barColor" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#ba68c8" />
-                        <stop offset="100%" stopColor="#2962ff" />
-                      </linearGradient>
-                    </defs>
-                    <Bar dataKey="uv" fill="url(#barColor)" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            <div className="stat-box">
-              <div className="stat-box-title">Trend Analysis</div>
-              <div style={{ flex: 1, minHeight: '120px', width: '100%' }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={barChartData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)"/>
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={10} stroke="var(--text-muted)"/>
-                    <YAxis axisLine={false} tickLine={false} fontSize={10} stroke="var(--text-muted)"/>
-                    <Line type="monotone" dataKey="pv" stroke="#f23645" dot={{r: 2}} strokeWidth={2}/>
-                    <Line type="monotone" dataKey="uv" stroke="#2962ff" dot={{r: 2}} strokeWidth={2}/>
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            <div className="stat-box">
-              <div className="stat-box-title">Market Activity</div>
-              <div style={{ flex: 1, minHeight: '120px', width: '100%' }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={barChartData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)"/>
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={10} stroke="var(--text-muted)"/>
-                    <YAxis axisLine={false} tickLine={false} fontSize={10} stroke="var(--text-muted)"/>
-                    <defs>
-                      <linearGradient id="barColor2" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#29b6f6" />
-                        <stop offset="100%" stopColor="#2962ff" />
-                      </linearGradient>
-                    </defs>
-                    <Bar dataKey="pv" fill="url(#barColor2)" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+              <div>
+                <div style={{ fontSize: '10px', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between' }}>
+                  <span>AI Recommended</span> <span>60%</span>
+                </div>
+                <div className="risk-meter-container"><div className="risk-meter-fill" style={{ width: '60%', background: 'var(--accent-blue)', opacity: 0.3 }}></div></div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right Sidebar */}
-        <div className="right-column">
-          <div className="crypto-list-header">
-            <div className="crypto-tab active">Cryptocurrencies</div>
-            <div className="crypto-tab hover-effect" onClick={() => navigate('/markets')}>Markets</div>
-          </div>
-
-          <div style={{ padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)' }}>
-            <span style={{color: 'var(--text-muted)'}}>Notifications</span>
-            <div style={{display:'flex', gap:'8px', cursor: 'pointer'}}>
-              <div style={{width: 30, height: 16, background: '#089981', borderRadius: 8}}></div>
-              <span style={{color: 'var(--text-muted)', fontSize: '12px'}}>Sound</span>
-              <div style={{width: 30, height: 16, background: '#f23645', borderRadius: 8}}></div>
+        <div className="glass-panel ai-card">
+          <div className="ai-card-title">Risk Meter</div>
+          <div style={{ textAlign: 'center', padding: '10px 0', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div style={{ fontSize: '32px', fontWeight: '700', color: 'var(--accent-blue)' }}>65<span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>/100</span></div>
+            <div style={{ color: 'var(--accent-orange)', fontWeight: '600', marginTop: '4px', letterSpacing: '1px' }}>MEDIUM RISK</div>
+            <div className="risk-meter-container" style={{ height: '12px', marginTop: '16px' }}>
+              <div className="risk-meter-fill" style={{ width: '65%', background: 'linear-gradient(90deg, var(--accent-green), var(--accent-orange))' }}></div>
             </div>
           </div>
+        </div>
 
-          <div className="crypto-list">
-            {cryptoList.map((crypto, idx) => (
-              <div
-                className={`crypto-item ${activeAsset === crypto.name ? 'selected-asset' : ''}`}
-                key={idx}
-                onClick={() => handleAssetChange(crypto.name, crypto.price)}
-              >
-                <div className="crypto-symbol-col">
-                  <div className="coin-icon" style={{ width: 28, height: 28, fontSize: 11, background: 'var(--border)' }}>
-                    {crypto.symbol.charAt(0)}
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: 'bold' }}>{crypto.symbol}</div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{crypto.name}</div>
-                  </div>
+        <div className="glass-panel ai-card">
+          <div className="ai-card-title">Activity Feed</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', overflowY: 'auto' }}>
+            {[
+              { msg: 'Rebalanced ETH → USDT', time: '12m ago', icon: CheckCircle, col: 'var(--accent-green)' },
+              { msg: 'Risk level adjusted to Medium', time: '2h ago', icon: Shield, col: 'var(--accent-blue)' },
+              { msg: 'Yield improved +1.2%', time: '5h ago', icon: TrendingUp, col: 'var(--accent-green)' },
+            ].map((ev, i) => (
+              <div key={i} style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                <div style={{ width: 24, height: 24, borderRadius: '6px', background: `${ev.col}10`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <ev.icon size={14} color={ev.col} />
                 </div>
-                <div style={{ flex: 1, minHeight: '35px' }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={crypto.isPos ? smallAreaChartData : smallAreaChartDataRed}>
-                      <Line type="monotone" dataKey="pv" stroke={crypto.isPos ? '#089981' : '#f23645'} strokeWidth={1.5} dot={false} isAnimationActive={false} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="crypto-price-col">
-                  <div style={{ fontWeight: 'bold', color: crypto.isPos ? 'var(--accent-green)' : 'var(--accent-red)' }}>
-                    ${crypto.price}
-                  </div>
-                  <div style={{ fontSize: '11px', color: crypto.isPos ? 'var(--accent-green)' : 'var(--accent-red)' }}>
-                    {crypto.change}
-                  </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '12px', fontWeight: '500' }}>{ev.msg}</div>
+                  <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{ev.time}</div>
                 </div>
               </div>
             ))}
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
-// Shell layout that wraps all pages
 function AppShell() {
-  const [balance, setBalance] = useState(5367.50);
+  const [balance, setBalance] = useState(21340.50);
 
   return (
-    <div className="trading-dashboard">
-      <TopNav balance={balance} />
-      <Routes>
-        <Route path="/" element={<TradingDashboard balance={balance} setBalance={setBalance} />} />
-        <Route path="/markets" element={<Markets />} />
-        <Route path="/portfolio" element={<Portfolio />} />
-        <Route path="/watchlist" element={<Watchlist />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/settings" element={<SettingsPage />} />
-      </Routes>
+    <div className="vault-shell">
+      <Sidebar />
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', overflow: 'hidden' }}>
+        {/* Simple top bar for search/balance */}
+        <div style={{ height: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 8px' }}>
+          <div style={{ background: 'var(--bg-panel)', padding: '6px 16px', borderRadius: '20px', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '10px', width: '300px' }}>
+            <Search size={14} color="var(--text-muted)" />
+            <input type="text" placeholder="Search assets..." style={{ background: 'none', border: 'none', color: 'white', outline: 'none', fontSize: '12px' }} />
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Net Worth</div>
+              <div style={{ fontSize: '15px', fontWeight: '700', color: 'var(--accent-green)' }}>
+                ${balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              </div>
+            </div>
+            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--bg-panel-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border)' }}>
+              <User size={16} />
+            </div>
+          </div>
+        </div>
+        
+        <Routes>
+          <Route path="/" element={<VaultDashboard />} />
+          <Route path="/markets" element={<Markets />} />
+          <Route path="/portfolio" element={<Portfolio />} />
+          <Route path="/watchlist" element={<Watchlist />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<SettingsPage />} />
+        </Routes>
+      </div>
     </div>
   );
 }
