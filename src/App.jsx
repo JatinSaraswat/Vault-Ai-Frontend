@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { 
   Home, List, BarChart2, Star, Search, User, Settings, X, Plus, 
   ArrowUpRight, ArrowDownRight, Target, Clock, ChevronDown, CheckCircle, AlertCircle,
@@ -6,9 +7,14 @@ import {
 } from 'lucide-react';
 import { 
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, LineChart, Line
+  LineChart, Line
 } from 'recharts';
 import './index.css';
+import Markets from './pages/Markets.jsx';
+import Portfolio from './pages/Portfolio.jsx';
+import Watchlist from './pages/Watchlist.jsx';
+import Profile from './pages/Profile.jsx';
+import SettingsPage from './pages/Settings.jsx';
 
 // Base Mock Data
 const generateData = () => Array.from({ length: 40 }, (_, i) => ({
@@ -18,7 +24,6 @@ const generateData = () => Array.from({ length: 40 }, (_, i) => ({
   amt: Math.random() * 2000 + 2000,
 }));
 
-// Small chart data
 const smallAreaChartData = [
   { pv: 2400 }, { pv: 1398 }, { pv: 9800 }, { pv: 3908 },
   { pv: 4800 }, { pv: 3800 }, { pv: 4300 }, { pv: 8900 }
@@ -73,17 +78,79 @@ function Toast({ message, type, onClose }) {
 
 const MULTIPLIERS = ['x5', 'x10', 'x25', 'x50', 'x100', 'x200'];
 
-export default function App() {
+// TopNav component (shared across all pages)
+function TopNav({ balance }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const navItems = [
+    { icon: Home, path: '/', title: 'Trading Dashboard' },
+    { icon: List, path: '/markets', title: 'Markets' },
+    { icon: BarChart2, path: '/portfolio', title: 'Portfolio' },
+    { icon: Star, path: '/watchlist', title: 'Watchlist' },
+  ];
+
+  return (
+    <header className="top-nav">
+      <div className="nav-left">
+        <div className="brand" onClick={() => navigate('/')} style={{cursor:'pointer'}}>TRADING<br/>PLATFORM</div>
+        <div className="nav-links">
+          {navItems.map(({ icon: Icon, path, title }) => (
+            <div
+              key={path}
+              className={`nav-link ${location.pathname === path ? 'nav-link-active' : ''}`}
+              onClick={() => navigate(path)}
+              title={title}
+            >
+              <Icon size={16} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="nav-center">
+        <div className="search-bar">
+          <Search size={16} color="var(--text-muted)" />
+          <input type="text" placeholder="Search markets..." />
+        </div>
+      </div>
+
+      <div className="nav-right">
+        <div
+          className="user-balance hover-effect"
+          style={{ padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}
+          onClick={() => navigate('/portfolio')}
+          title="View Portfolio"
+        >
+          <div style={{ fontSize: '11px' }}>Balance:</div>
+          <div className="balance-amount">
+            ${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            <ChevronDown size={12} display="inline" style={{marginLeft: '4px'}} />
+          </div>
+        </div>
+        <div className="user-profile" onClick={() => navigate('/profile')} title="Profile">
+          <User size={20} />
+        </div>
+        <div className="user-profile" onClick={() => navigate('/settings')} title="Settings">
+          <Settings size={18} color="var(--text-muted)" />
+        </div>
+      </div>
+    </header>
+  );
+}
+
+// The main trading dashboard (Home page)
+function TradingDashboard({ balance, setBalance }) {
   const [amount, setAmount] = useState(100);
   const [multiplier, setMultiplier] = useState('x50');
-  const [balance, setBalance] = useState(5367.50);
   const [activeAsset, setActiveAsset] = useState('EUR/USD');
   const [openingPrice, setOpeningPrice] = useState(1.05);
   const [toast, setToast] = useState(null);
   const [autoClose, setAutoClose] = useState(false);
-  const [countdown, setCountdown] = useState(60 * 60 + 33 * 60 + 16); // 1h 33m 16s in seconds
+  const [countdown, setCountdown] = useState(60 * 60 + 33 * 60 + 16);
+  const [chartData, setChartData] = useState(generateData());
+  const navigate = useNavigate();
 
-  // Live countdown timer
   useEffect(() => {
     const t = setInterval(() => setCountdown(prev => prev > 0 ? prev - 1 : 0), 1000);
     return () => clearInterval(t);
@@ -96,49 +163,34 @@ export default function App() {
     return `${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
   };
 
-  // State for live chart
-  const [chartData, setChartData] = useState(generateData());
-
-  // Simulate Live Market Data
   useEffect(() => {
     const interval = setInterval(() => {
       setChartData(prevData => {
         const newData = [...prevData];
-        // Shift data by 1 to make it "scroll"
         newData.shift();
         const lastData = prevData[prevData.length - 1];
-        
-        // Randomly walk the value
         const randomChangeUV = (Math.random() - 0.5) * 200;
         const randomChangePV = (Math.random() - 0.5) * 100;
-        
         const newTime = parseInt(lastData.time.split(':')[0]);
         const nextTime = newTime >= 23 ? '00:00' : `${newTime + 1}:00`;
-        
         newData.push({
           time: nextTime,
           uv: Math.max(1000, lastData.uv + randomChangeUV),
           pv: Math.max(1000, lastData.pv + randomChangePV),
           amt: lastData.amt
         });
-        
         return newData;
       });
-      
-      // Also slightly wiggle the opening price
       setOpeningPrice(prev => prev + (Math.random() - 0.5) * (prev * 0.001));
     }, 2000);
     return () => clearInterval(interval);
   }, []);
 
-  const showToast = (message, type = 'success') => {
-    setToast({ message, type });
-  };
+  const showToast = (message, type = 'success') => setToast({ message, type });
 
   const handleAssetChange = (assetName, price) => {
     setActiveAsset(assetName);
     setOpeningPrice(price);
-    // Regenerate chart to simulate looking at a different asset
     setChartData(generateData());
   };
 
@@ -152,10 +204,7 @@ export default function App() {
 
   const handleTrade = (type) => {
     const numAmount = parseFloat(amount || 0);
-    if (numAmount <= 0) {
-      showToast("Please enter a valid amount", "error");
-      return;
-    }
+    if (numAmount <= 0) { showToast("Please enter a valid amount", "error"); return; }
     if (balance >= numAmount) {
       setBalance(prev => prev - numAmount);
       showToast(`Successfully ${type} $${numAmount} of ${activeAsset}`);
@@ -166,10 +215,7 @@ export default function App() {
 
   const handleExchange = () => {
     const numAmount = parseFloat(amount || 0);
-    if (numAmount <= 0) {
-      showToast("Please enter a valid amount", "error");
-      return;
-    }
+    if (numAmount <= 0) { showToast("Please enter a valid amount", "error"); return; }
     if (balance >= numAmount) {
        setBalance(prev => prev - numAmount);
        showToast(`Exchanged $${numAmount.toFixed(2)} successfully!`);
@@ -179,48 +225,11 @@ export default function App() {
   };
 
   return (
-    <div className="trading-dashboard">
+    <>
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-      
-      {/* Top Navbar */}
-      <header className="top-nav">
-        <div className="nav-left">
-          <div className="brand">TRADING<br/>PLATFORM</div>
-          <div className="nav-links">
-            <div className="nav-link"><Home size={16} /></div>
-            <div className="nav-link"><List size={16} /></div>
-            <div className="nav-link"><BarChart2 size={16} /></div>
-            <div className="nav-link"><Star size={16} /></div>
-          </div>
-        </div>
-
-        <div className="nav-center">
-          <div className="search-bar">
-            <Search size={16} color="var(--text-muted)" />
-            <input type="text" placeholder="Search markets..." />
-          </div>
-        </div>
-
-        <div className="nav-right">
-          <div className="user-balance hover-effect" style={{ padding: '4px 8px', borderRadius: '4px' }}>
-            <div style={{ fontSize: '11px' }}>Balance:</div>
-            <div className="balance-amount">
-              ${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} 
-              <ChevronDown size={12} display="inline" style={{marginLeft: '4px'}} />
-            </div>
-          </div>
-          <div className="user-profile">
-            <User size={20} />
-            <Settings size={18} color="var(--text-muted)" />
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content Area */}
       <div className="main-layout">
-        {/* Left Side (Charts & Panels) */}
+        {/* Left Column */}
         <div className="left-column">
-          
           {/* Ticker Row */}
           <div className="tickers-row">
             <div className="ticker-card hover-effect" onClick={() => handleAssetChange('DASH', 110.01)}>
@@ -232,11 +241,11 @@ export default function App() {
                 </div>
               </div>
               <div className="ticker-chart" style={{ height: '40px', width: '80px' }}>
-                 <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={smallAreaChartData}>
-                      <Line type="monotone" dataKey="pv" stroke="#089981" strokeWidth={2} dot={false} isAnimationActive={false} />
-                    </LineChart>
-                 </ResponsiveContainer>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={smallAreaChartData}>
+                    <Line type="monotone" dataKey="pv" stroke="#089981" strokeWidth={2} dot={false} isAnimationActive={false} />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
               <div className="ticker-price">
                 <div className="positive">$110.01</div>
@@ -253,11 +262,11 @@ export default function App() {
                 </div>
               </div>
               <div className="ticker-chart" style={{ height: '40px', width: '80px' }}>
-                 <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={smallAreaChartData}>
-                      <Line type="monotone" dataKey="pv" stroke="#089981" strokeWidth={2} dot={false} isAnimationActive={false} />
-                    </LineChart>
-                 </ResponsiveContainer>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={smallAreaChartData}>
+                    <Line type="monotone" dataKey="pv" stroke="#089981" strokeWidth={2} dot={false} isAnimationActive={false} />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
               <div className="ticker-price">
                 <div className="positive">$2.23</div>
@@ -274,11 +283,11 @@ export default function App() {
                 </div>
               </div>
               <div className="ticker-chart" style={{ height: '40px', width: '80px' }}>
-                 <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={smallAreaChartDataRed}>
-                      <Line type="monotone" dataKey="pv" stroke="#f23645" strokeWidth={2} dot={false} isAnimationActive={false} />
-                    </LineChart>
-                 </ResponsiveContainer>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={smallAreaChartDataRed}>
+                    <Line type="monotone" dataKey="pv" stroke="#f23645" strokeWidth={2} dot={false} isAnimationActive={false} />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
               <div className="ticker-price">
                 <div className="negative">$0.508</div>
@@ -287,10 +296,9 @@ export default function App() {
             </div>
           </div>
 
-          {/* Main Chart Area */}
+          {/* Main Chart + Order */}
           <div className="chart-and-order">
             <div className="main-chart" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-              {/* Asset Info Header */}
               <div style={{ display: 'flex', gap: '24px', marginBottom: '16px', fontSize: '13px', flexWrap: 'wrap' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>
                   <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#f23645' }}></div>
@@ -309,12 +317,10 @@ export default function App() {
                 <div>
                   <span style={{ color: 'var(--text-muted)' }}>Profit </span>
                   <span style={{ color: 'var(--accent-green)', fontWeight: 'bold' }}>
-                     +${(parseFloat(amount || 0) * 0.15).toFixed(2)}
+                    +${(parseFloat(amount || 0) * 0.15).toFixed(2)}
                   </span>
                 </div>
               </div>
-              
-              {/* Explicit height wrapper to prevent Recharts collapse */}
               <div style={{ flex: 1, minHeight: '350px', width: '100%' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} animationDuration={400}>
@@ -340,7 +346,6 @@ export default function App() {
 
             {/* Order Panel */}
             <div className="order-panel">
-              {/* Amount with stepper */}
               <div className="form-group">
                 <label>Amount</label>
                 <div className="amount-stepper">
@@ -358,7 +363,6 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Multiplier chips */}
               <div className="form-group">
                 <label>Multiplier</label>
                 <div className="multiplier-chips">
@@ -372,7 +376,6 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Auto Closing toggle */}
               <div className="form-group">
                 <div className="auto-closing-row">
                   <label>Auto Closing</label>
@@ -391,13 +394,11 @@ export default function App() {
                 )}
               </div>
 
-              {/* Live Countdown */}
               <div className="countdown-box">
                 <Clock size={14} color="var(--text-muted)"/>
                 <span className="countdown-time">{formatCountdown(countdown)}</span>
               </div>
 
-              {/* Buy / Sell buttons */}
               <div className="trade-buttons">
                 <button className="btn-buy interactive-btn" onClick={() => handleTrade('bought')}>
                   <ArrowDownRight size={22} />
@@ -418,20 +419,20 @@ export default function App() {
           {/* Quick Tabs row */}
           <div className="tabs-row" style={{ overflowX: 'auto', paddingBottom: '4px' }}>
             {['EUR/USD', 'Bitcoin', 'Ethereum', 'Gold', 'Oil WTI', 'Oil Brent'].map(asset => (
-              <div 
-                key={asset} 
+              <div
+                key={asset}
                 className={`tab-item hover-effect ${activeAsset === asset ? 'active' : ''}`}
                 onClick={() => handleAssetChange(asset, asset === 'EUR/USD' ? 1.05 : 23000)}
               >
                 {activeAsset === asset && <Target size={14} color="#f23645" />}
-                {asset} 
+                {asset}
                 <X size={14} color="var(--text-muted)" style={{cursor: 'pointer'}} />
               </div>
             ))}
             <div className="tab-item hover-effect" style={{ padding: '12px' }}><Plus size={16} /></div>
           </div>
 
-          {/* Bottom Stats Row */}
+          {/* Bottom Stats */}
           <div className="bottom-stats">
             <div className="stat-box">
               <div className="stat-box-title">Volume Overview</div>
@@ -442,10 +443,10 @@ export default function App() {
                     <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={10} stroke="var(--text-muted)"/>
                     <YAxis axisLine={false} tickLine={false} fontSize={10} stroke="var(--text-muted)"/>
                     <defs>
-                       <linearGradient id="barColor" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#ba68c8" />
-                          <stop offset="100%" stopColor="#2962ff" />
-                       </linearGradient>
+                      <linearGradient id="barColor" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#ba68c8" />
+                        <stop offset="100%" stopColor="#2962ff" />
+                      </linearGradient>
                     </defs>
                     <Bar dataKey="uv" fill="url(#barColor)" radius={[4, 4, 0, 0]} />
                   </BarChart>
@@ -454,9 +455,9 @@ export default function App() {
             </div>
 
             <div className="stat-box">
-               <div className="stat-box-title">Trend Analysis</div>
-               <div style={{ flex: 1, minHeight: '120px', width: '100%' }}>
-                 <ResponsiveContainer width="100%" height="100%">
+              <div className="stat-box-title">Trend Analysis</div>
+              <div style={{ flex: 1, minHeight: '120px', width: '100%' }}>
+                <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={barChartData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)"/>
                     <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={10} stroke="var(--text-muted)"/>
@@ -477,10 +478,10 @@ export default function App() {
                     <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={10} stroke="var(--text-muted)"/>
                     <YAxis axisLine={false} tickLine={false} fontSize={10} stroke="var(--text-muted)"/>
                     <defs>
-                       <linearGradient id="barColor2" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#29b6f6" />
-                          <stop offset="100%" stopColor="#2962ff" />
-                       </linearGradient>
+                      <linearGradient id="barColor2" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#29b6f6" />
+                        <stop offset="100%" stopColor="#2962ff" />
+                      </linearGradient>
                     </defs>
                     <Bar dataKey="pv" fill="url(#barColor2)" radius={[4, 4, 0, 0]} />
                   </BarChart>
@@ -488,29 +489,28 @@ export default function App() {
               </div>
             </div>
           </div>
-          
         </div>
 
-        {/* Right Sidebar (Crypto List) */}
+        {/* Right Sidebar */}
         <div className="right-column">
           <div className="crypto-list-header">
             <div className="crypto-tab active">Cryptocurrencies</div>
-            <div className="crypto-tab hover-effect">Exchanges</div>
+            <div className="crypto-tab hover-effect" onClick={() => navigate('/markets')}>Markets</div>
           </div>
-          
+
           <div style={{ padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)' }}>
-             <span style={{color: 'var(--text-muted)'}}>Notifications</span>
-             <div style={{display:'flex', gap:'8px', cursor: 'pointer'}}>
-               <div style={{width: 30, height: 16, background: '#089981', borderRadius: 8}}></div>
-               <span style={{color: 'var(--text-muted)', fontSize: '12px'}}>Sound</span>
-               <div style={{width: 30, height: 16, background: '#f23645', borderRadius: 8}}></div>
-             </div>
+            <span style={{color: 'var(--text-muted)'}}>Notifications</span>
+            <div style={{display:'flex', gap:'8px', cursor: 'pointer'}}>
+              <div style={{width: 30, height: 16, background: '#089981', borderRadius: 8}}></div>
+              <span style={{color: 'var(--text-muted)', fontSize: '12px'}}>Sound</span>
+              <div style={{width: 30, height: 16, background: '#f23645', borderRadius: 8}}></div>
+            </div>
           </div>
 
           <div className="crypto-list">
             {cryptoList.map((crypto, idx) => (
-              <div 
-                className={`crypto-item ${activeAsset === crypto.name ? 'selected-asset' : ''}`} 
+              <div
+                className={`crypto-item ${activeAsset === crypto.name ? 'selected-asset' : ''}`}
                 key={idx}
                 onClick={() => handleAssetChange(crypto.name, crypto.price)}
               >
@@ -543,6 +543,33 @@ export default function App() {
           </div>
         </div>
       </div>
+    </>
+  );
+}
+
+// Shell layout that wraps all pages
+function AppShell() {
+  const [balance, setBalance] = useState(5367.50);
+
+  return (
+    <div className="trading-dashboard">
+      <TopNav balance={balance} />
+      <Routes>
+        <Route path="/" element={<TradingDashboard balance={balance} setBalance={setBalance} />} />
+        <Route path="/markets" element={<Markets />} />
+        <Route path="/portfolio" element={<Portfolio />} />
+        <Route path="/watchlist" element={<Watchlist />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/settings" element={<SettingsPage />} />
+      </Routes>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppShell />
+    </BrowserRouter>
   );
 }
