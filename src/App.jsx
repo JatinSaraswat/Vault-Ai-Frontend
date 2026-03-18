@@ -57,6 +57,26 @@ export default function App() {
     setChartData(generateData());
   };
 
+  const handleTrade = (type) => {
+    const numAmount = parseFloat(amount || 0);
+    if (balance >= numAmount) {
+      setBalance(prev => prev - numAmount);
+      alert(`Successfully ${type} ${amount} on ${activeAsset}!`);
+    } else {
+      alert("Insufficient balance!");
+    }
+  };
+
+  const handleExchange = () => {
+    const numAmount = parseFloat(amount || 0);
+    if (balance >= numAmount) {
+       setBalance(prev => prev - numAmount);
+       alert(`Exchanged ${amount} from Balance!`);
+    } else {
+       alert("Insufficient balance to exchange!");
+    }
+  };
+
   return (
     <div className="trading-dashboard">
       {/* Top Navbar */}
