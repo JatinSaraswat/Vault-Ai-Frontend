@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { 
   Search, Filter, TrendingUp, TrendingDown, Info, 
-  Layers, AlertCircle, Zap, Star, ChevronRight, Activity
+  Layers, AlertCircle, Zap, Star, ChevronRight, Activity, Shield
 } from 'lucide-react';
-import { ResponsiveContainer, LineChart, Line } from 'recharts';
 
 const MARKET_DATA = [
   { id: 1, symbol: 'BTC/USD', name: 'Bitcoin', price: 41509.23, change: '+2.41%', isPos: true, yield: '3.2%', risk: 'Low', category: 'Crypto' },
@@ -14,10 +13,6 @@ const MARKET_DATA = [
   { id: 6, symbol: 'GBP/USD', name: 'Pound / US Dollar', price: 1.2741, change: '-0.08%', isPos: false, yield: '0.0%', risk: 'Low', category: 'Forex' },
   { id: 7, symbol: 'GOLD', name: 'Gold Spot', price: 2024.50, change: '+0.45%', isPos: true, yield: '0.0%', risk: 'Low', category: 'Commodities' },
   { id: 8, symbol: 'OIL', name: 'Crude Oil WTI', price: 73.20, change: '-1.22%', isPos: false, yield: '0.0%', risk: 'Medium', category: 'Commodities' },
-];
-
-const miniChartData = [
-  { v: 40 }, { v: 45 }, { v: 42 }, { v: 50 }, { v: 48 }, { v: 55 }, { v: 52 }, { v: 60 }
 ];
 
 export default function Markets() {
@@ -32,8 +27,8 @@ export default function Markets() {
   });
 
   return (
-    <div className="main-content">
-      <div className="ai-header" style={{ marginBottom: '12px' }}>
+    <div className="main-content" style={{ display: 'flex', flexDirection: 'column' }}>
+      <div className="ai-header" style={{ marginBottom: '12px', flexShrink: 0 }}>
         <div>
           <h2 style={{ fontSize: '20px', fontWeight: '700' }}>Smart Market Explorer</h2>
           <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>AI-filtered opportunities & yield-bearing assets</p>
@@ -51,13 +46,13 @@ export default function Markets() {
         </div>
       </div>
 
-      <div className="glass-panel" style={{ flex: 1, padding: '20px', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+      <div className="glass-panel" style={{ flex: 1, padding: '20px', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px', flexShrink: 0 }}>
           <div style={{ display: 'flex', background: 'var(--bg-main)', padding: '8px 16px', borderRadius: '10px', border: '1px solid var(--border)', width: '300px', alignItems: 'center', gap: '8px' }}>
             <Search size={14} color="var(--text-muted)" />
             <input 
               type="text" 
-              placeholder="Filter by symbol or name..." 
+              placeholder="Filter by symbol..." 
               style={{ background: 'none', border: 'none', color: 'white', outline: 'none', fontSize: '12px', width: '100%' }}
               value={search}
               onChange={e => setSearch(e.target.value)}
@@ -68,9 +63,9 @@ export default function Markets() {
           </div>
         </div>
 
-        <div style={{ overflowX: 'auto' }}>
+        <div style={{ overflowY: 'auto', flex: 1 }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-            <thead>
+            <thead style={{ position: 'sticky', top: 0, background: 'var(--bg-panel)', zIndex: 1, backdropFilter: 'blur(8px)' }}>
               <tr style={{ color: 'var(--text-muted)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>
                 <th style={{ padding: '12px' }}>Asset</th>
                 <th style={{ padding: '12px' }}>Price</th>
