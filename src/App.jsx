@@ -48,7 +48,7 @@ export default function App() {
           <div className="logo-icon">
              <Zap size={24} color="white" />
           </div>
-          <h1 style={{ fontSize: '20px', fontWeight: 700 }}>VaultAI</h1>
+          <h1 style={{ fontSize: '20px', fontWeight: 700 }}>TRADING PLATFORM</h1>
         </div>
         
         <nav className="nav-links">

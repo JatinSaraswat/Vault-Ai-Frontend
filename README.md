@@ -1,4 +1,4 @@
-# VaultAI: ML-Driven DeFi Wallet for Automated Yield Optimization
+# Trading Platform Dashboard
 
 **T63-6th-sem-project**  
 *This Repository contains tasks for our 6th semester mini project. Synopsis hardcopy is submitted and has been signed by our mentor!*
