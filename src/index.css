@@ -37,6 +37,29 @@ body {
   gap: 8px;
 }
 
+/* Common Interactions */
+.hover-effect {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.hover-effect:hover {
+  background-color: var(--bg-panel-hover);
+  color: var(--text-main);
+}
+
+.interactive-btn {
+  transition: transform 0.1s ease, filter 0.2s ease;
+}
+
+.interactive-btn:hover {
+  filter: brightness(1.2);
+}
+
+.interactive-btn:active {
+  transform: scale(0.97);
+}
+
 /* Top Navigation */
 .top-nav {
   display: flex;
@@ -73,10 +96,14 @@ body {
   gap: 4px;
   color: var(--text-muted);
   cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
 }
 
 .nav-link:hover, .nav-link.active {
   color: var(--text-main);
+  background-color: var(--bg-panel-hover);
 }
 
 .nav-center {
@@ -94,6 +121,12 @@ body {
   border-radius: 20px;
   padding: 4px 12px;
   width: 300px;
+  transition: border-color 0.3s;
+  border: 1px solid transparent;
+}
+
+.search-bar:focus-within {
+  border-color: var(--accent-blue);
 }
 
 .search-bar input {
@@ -122,12 +155,19 @@ body {
   color: var(--accent-green);
   font-weight: 700;
   font-size: 14px;
+  cursor: pointer;
 }
 
 .user-profile {
   display: flex;
   align-items: center;
   gap: 8px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+}
+.user-profile:hover {
+  background-color: var(--bg-panel-hover);
 }
 
 /* Main Layout */
@@ -148,10 +188,10 @@ body {
 }
 
 /* Scrollbar styling */
-.left-column::-webkit-scrollbar {
+.left-column::-webkit-scrollbar, .crypto-list::-webkit-scrollbar {
   width: 6px;
 }
-.left-column::-webkit-scrollbar-thumb {
+.left-column::-webkit-scrollbar-thumb, .crypto-list::-webkit-scrollbar-thumb {
   background: var(--bg-panel-hover);
   border-radius: 4px;
 }
@@ -164,72 +204,14 @@ body {
   flex-direction: column;
 }
 
-/* Tickers Row */
-.tickers-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-
-.ticker-card {
-  background-color: var(--bg-panel);
-  border-radius: 4px;
-  padding: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.ticker-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.coin-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-main);
-  font-weight: bold;
-}
-
-.ticker-name {
-  font-weight: 700;
-  font-size: 14px;
-}
-
-.ticker-symbol {
-  color: var(--text-muted);
-  font-size: 11px;
-}
-
-.ticker-chart {
-  width: 60px;
-  height: 30px;
-}
-
-.ticker-price {
-  text-align: right;
-}
-
-.ticker-change {
-  font-size: 11px;
-}
-
-.positive { color: var(--accent-green); }
-.negative { color: var(--accent-red); }
-
+/* Tickers Row */ ... (omitted intentionally) ...
 /* Main Chart Area */
 .chart-and-order {
   display: flex;
   background-color: var(--bg-panel);
   border-radius: 4px;
   flex: 1;
-  min-height: 400px;
+  min-height: 440px;
 }
 
 .main-chart {
@@ -266,6 +248,10 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  transition: border-color 0.2s;
+}
+.input-box:focus-within {
+  border-color: var(--accent-blue);
 }
 
 .trade-buttons {
@@ -304,32 +290,13 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  white-space: nowrap;
+  transition: all 0.2s;
 }
 
 .tab-item.active {
   border-bottom: 2px solid var(--accent-red);
-}
-
-/* Bottom Stats Area */
-.bottom-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px;
-}
-
-.stat-box {
-  background-color: var(--bg-panel);
-  border-radius: 4px;
-  padding: 16px;
-  height: 180px;
-  display: flex;
-  flex-direction: column;
-}
-
-.stat-box-title {
-  color: var(--text-muted);
-  margin-bottom: 8px;
-  font-size: 12px;
+  background-color: var(--bg-panel-hover);
 }
 
 /* Cryptocurrencies List Panel */
@@ -365,10 +332,17 @@ body {
   border-bottom: 1px solid var(--border);
   gap: 12px;
   cursor: pointer;
+  transition: background-color 0.2s, border-left 0.2s;
+  border-left: 2px solid transparent;
 }
 
 .crypto-item:hover {
   background-color: var(--bg-panel-hover);
+}
+
+.crypto-item.selected-asset {
+  background-color: rgba(41, 98, 255, 0.05);
+  border-left: 2px solid var(--accent-blue);
 }
 
 .crypto-symbol-col {
@@ -393,17 +367,9 @@ body {
   stroke: var(--border) !important;
 }
 
-.pill-indicator {
-  padding: 2px 6px;
-  border-radius: 12px;
-  font-size: 10px;
-}
-
-.pill-buy { background: rgba(8, 153, 129, 0.2); color: var(--accent-green); }
-.pill-sell { background: rgba(242, 54, 69, 0.2); color: var(--accent-red); }
-
-.flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Clean up input spinners */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
 }
