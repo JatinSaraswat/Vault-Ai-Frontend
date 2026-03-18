@@ -130,3 +130,5 @@ export default function Markets() {
     </div>
   );
 }
+
+// Smart Market Data Layer
