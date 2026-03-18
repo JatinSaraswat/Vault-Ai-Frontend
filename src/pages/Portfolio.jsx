@@ -139,3 +139,5 @@ export default function Portfolio() {
     </div>
   );
 }
+
+// Final AI Optimization Layer
