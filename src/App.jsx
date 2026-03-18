@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
-  Home, List, BarChart2, Star, Search, RefreshCw, Bell, User, Settings, X, Plus, 
-  ArrowUpRight, ArrowDownRight, Target, Clock, ChevronDown, CheckCircle, AlertCircle
+  Home, List, BarChart2, Star, Search, User, Settings, X, Plus, 
+  ArrowUpRight, ArrowDownRight, Target, Clock, ChevronDown, CheckCircle, AlertCircle,
+  Minus
 } from 'lucide-react';
 import { 
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -70,14 +71,31 @@ function Toast({ message, type, onClose }) {
   );
 }
 
+const MULTIPLIERS = ['x5', 'x10', 'x25', 'x50', 'x100', 'x200'];
+
 export default function App() {
-  const [amount, setAmount] = useState('100');
+  const [amount, setAmount] = useState(100);
   const [multiplier, setMultiplier] = useState('x50');
   const [balance, setBalance] = useState(5367.50);
   const [activeAsset, setActiveAsset] = useState('EUR/USD');
   const [openingPrice, setOpeningPrice] = useState(1.05);
   const [toast, setToast] = useState(null);
-  
+  const [autoClose, setAutoClose] = useState(false);
+  const [countdown, setCountdown] = useState(60 * 60 + 33 * 60 + 16); // 1h 33m 16s in seconds
+
+  // Live countdown timer
+  useEffect(() => {
+    const t = setInterval(() => setCountdown(prev => prev > 0 ? prev - 1 : 0), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  const formatCountdown = (secs) => {
+    const h = Math.floor(secs / 3600);
+    const m = Math.floor((secs % 3600) / 60);
+    const s = secs % 60;
+    return `${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  };
+
   // State for live chart
   const [chartData, setChartData] = useState(generateData());
 
@@ -124,6 +142,14 @@ export default function App() {
     setChartData(generateData());
   };
 
+  const stepAmount = (dir) => {
+    setAmount(prev => {
+      const val = parseFloat(prev) || 0;
+      const step = val >= 1000 ? 100 : val >= 100 ? 10 : 5;
+      return Math.max(5, val + dir * step);
+    });
+  };
+
   const handleTrade = (type) => {
     const numAmount = parseFloat(amount || 0);
     if (numAmount <= 0) {
@@ -146,7 +172,7 @@ export default function App() {
     }
     if (balance >= numAmount) {
        setBalance(prev => prev - numAmount);
-       showToast(`Exchanged $${numAmount} successfully!`);
+       showToast(`Exchanged $${numAmount.toFixed(2)} successfully!`);
     } else {
        showToast("Insufficient balance to exchange!", "error");
     }
@@ -314,54 +340,76 @@ export default function App() {
 
             {/* Order Panel */}
             <div className="order-panel">
+              {/* Amount with stepper */}
               <div className="form-group">
                 <label>Amount</label>
-                <div className="input-box" style={{ cursor: 'text' }}>
-                  <span style={{color:'var(--text-muted)'}}>$</span>
-                  <input 
-                    type="number" 
-                    value={amount} 
-                    onChange={(e)=>setAmount(e.target.value)} 
-                    style={{background:'transparent', border:'none', color:'white', textAlign:'right', outline:'none', width: '100%'}} 
-                  />
+                <div className="amount-stepper">
+                  <button className="stepper-btn" onClick={() => stepAmount(-1)}><Minus size={14}/></button>
+                  <div className="stepper-display">
+                    <span className="stepper-currency">$</span>
+                    <input
+                      type="number"
+                      value={amount}
+                      onChange={e => setAmount(parseFloat(e.target.value) || 0)}
+                      className="stepper-input"
+                    />
+                  </div>
+                  <button className="stepper-btn" onClick={() => stepAmount(1)}><Plus size={14}/></button>
                 </div>
               </div>
 
+              {/* Multiplier chips */}
               <div className="form-group">
                 <label>Multiplier</label>
-                <div className="input-box" style={{ cursor: 'text' }}>
-                  <input 
-                    type="text" 
-                    value={multiplier} 
-                    onChange={(e)=>setMultiplier(e.target.value)} 
-                    style={{background:'transparent', border:'none', color:'white', outline:'none', width: '100%'}} 
-                  />
+                <div className="multiplier-chips">
+                  {MULTIPLIERS.map(m => (
+                    <button
+                      key={m}
+                      className={`chip-btn ${multiplier === m ? 'chip-active' : ''}`}
+                      onClick={() => setMultiplier(m)}
+                    >{m}</button>
+                  ))}
                 </div>
               </div>
 
+              {/* Auto Closing toggle */}
               <div className="form-group">
-                <label>Auto Closing</label>
-                <div className="input-box hover-effect" style={{ justifyContent: 'center' }}>
-                  <span>—</span>
+                <div className="auto-closing-row">
+                  <label>Auto Closing</label>
+                  <button
+                    className={`toggle-btn ${autoClose ? 'toggle-on' : ''}`}
+                    onClick={() => setAutoClose(p => !p)}
+                  >
+                    <span className="toggle-thumb"/>
+                  </button>
                 </div>
+                {autoClose && (
+                  <div className="input-box" style={{ marginTop: '6px' }}>
+                    <span style={{color:'var(--text-muted)', fontSize:'12px'}}>Close at profit $</span>
+                    <input type="number" defaultValue="50" className="stepper-input" style={{width:'60px', textAlign:'right'}}/>
+                  </div>
+                )}
               </div>
 
-              <div style={{ textAlign: 'center', fontSize: '24px', fontWeight: 'bold', margin: 'auto 0' }}>
-                <Clock size={16} display="inline" style={{marginRight: '8px', color: 'var(--text-muted)'}}/>
-                01h 33:16
+              {/* Live Countdown */}
+              <div className="countdown-box">
+                <Clock size={14} color="var(--text-muted)"/>
+                <span className="countdown-time">{formatCountdown(countdown)}</span>
               </div>
 
+              {/* Buy / Sell buttons */}
               <div className="trade-buttons">
-                <button className="btn-buy interactive-btn" onClick={() => handleTrade('bought')} style={{ display: 'flex', flexDirection: 'column', gap:'4px' }}>
-                  <ArrowDownRight size={20} />
-                  <span style={{fontSize: '11px'}}>BUY</span>
+                <button className="btn-buy interactive-btn" onClick={() => handleTrade('bought')}>
+                  <ArrowDownRight size={22} />
+                  <span>BUY</span>
                 </button>
-                <button className="btn-sell interactive-btn" onClick={() => handleTrade('sold')} style={{ display: 'flex', flexDirection: 'column', gap:'4px' }}>
-                  <ArrowUpRight size={20} />
-                  <span style={{fontSize: '11px'}}>SELL</span>
+                <button className="btn-sell interactive-btn" onClick={() => handleTrade('sold')}>
+                  <ArrowUpRight size={22} />
+                  <span>SELL</span>
                 </button>
               </div>
-              <button className="interactive-btn" onClick={handleExchange} style={{ background: 'linear-gradient(45deg, #f57c00, #ff9800)', color: 'white', border: 'none', padding: '14px', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer', marginTop: '8px' }}>
+
+              <button className="exchange-btn interactive-btn" onClick={handleExchange}>
                 Exchange
               </button>
             </div>
