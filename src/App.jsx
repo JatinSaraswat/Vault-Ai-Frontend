@@ -49,6 +49,23 @@ export default function App() {
   // State for live chart
   const [chartData, setChartData] = useState(generateData());
 
+  // Simulate Live Market Data
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setChartData(prevData => {
+        const newData = [...prevData];
+        const lastIndex = newData.length - 1;
+        // Jiggle the last data point
+        newData[lastIndex] = {
+          ...newData[lastIndex],
+          uv: newData[lastIndex].uv + (Math.random() * 200 - 100),
+          pv: newData[lastIndex].pv + (Math.random() * 100 - 50)
+        };
+        return newData;
+      });
+    }, 1500);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleAssetChange = (assetName, price) => {
     setActiveAsset(assetName);
