@@ -108,3 +108,5 @@ export default function Watchlist() {
     </div>
   );
 }
+
+// Sentiment Analysis Layer
