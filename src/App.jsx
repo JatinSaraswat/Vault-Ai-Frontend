@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Home, List, BarChart2, Star, Search, RefreshCw, Bell, User, Settings, X, Plus, 
-  ArrowUpRight, ArrowDownRight, Target, Clock, ChevronDown
+  ArrowUpRight, ArrowDownRight, Target, Clock, ChevronDown, CheckCircle, AlertCircle
 } from 'lucide-react';
 import { 
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -28,6 +28,16 @@ const smallAreaChartDataRed = [
   { pv: 4800 }, { pv: 2800 }, { pv: 4300 }, { pv: 2400 }
 ];
 
+const barChartData = [
+  { name: '1', uv: 400, pv: 240, amt: 240 },
+  { name: '2', uv: 300, pv: 139, amt: 221 },
+  { name: '3', uv: 200, pv: 980, amt: 229 },
+  { name: '4', uv: 278, pv: 390, amt: 200 },
+  { name: '5', uv: 189, pv: 480, amt: 218 },
+  { name: '6', uv: 239, pv: 380, amt: 250 },
+  { name: '7', uv: 349, pv: 430, amt: 210 },
+];
+
 const cryptoList = [
   { symbol: 'ETH', name: 'Ethereum', price: 2308.24, change: '+1.45%', isPos: true },
   { symbol: 'BTC', name: 'Bitcoin', price: 41509.23, change: '+2.41%', isPos: true },
@@ -39,12 +49,34 @@ const cryptoList = [
   { symbol: 'ZRX', name: '0x', price: 0.328, change: '-4.67%', isPos: false },
 ];
 
+// Simple Toast Component
+function Toast({ message, type, onClose }) {
+  useEffect(() => {
+    const t = setTimeout(onClose, 3000);
+    return () => clearTimeout(t);
+  }, [onClose]);
+
+  return (
+    <div style={{
+      position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)',
+      backgroundColor: 'var(--bg-panel)', borderLeft: `4px solid ${type === 'success' ? 'var(--accent-green)' : 'var(--accent-red)'}`,
+      padding: '12px 24px', borderRadius: '4px', boxShadow: '0 8px 16px rgba(0,0,0,0.5)',
+      display: 'flex', alignItems: 'center', gap: '12px', zIndex: 1000,
+      color: 'white', fontWeight: 'bold', fontSize: '14px', animation: 'slideUp 0.3s ease-out'
+    }}>
+      {type === 'success' ? <CheckCircle color="var(--accent-green)" /> : <AlertCircle color="var(--accent-red)" />}
+      {message}
+    </div>
+  );
+}
+
 export default function App() {
   const [amount, setAmount] = useState('100');
   const [multiplier, setMultiplier] = useState('x50');
   const [balance, setBalance] = useState(5367.50);
   const [activeAsset, setActiveAsset] = useState('EUR/USD');
   const [openingPrice, setOpeningPrice] = useState(1.05);
+  const [toast, setToast] = useState(null);
   
   // State for live chart
   const [chartData, setChartData] = useState(generateData());
@@ -54,18 +86,36 @@ export default function App() {
     const interval = setInterval(() => {
       setChartData(prevData => {
         const newData = [...prevData];
-        const lastIndex = newData.length - 1;
-        // Jiggle the last data point
-        newData[lastIndex] = {
-          ...newData[lastIndex],
-          uv: newData[lastIndex].uv + (Math.random() * 200 - 100),
-          pv: newData[lastIndex].pv + (Math.random() * 100 - 50)
-        };
+        // Shift data by 1 to make it "scroll"
+        newData.shift();
+        const lastData = prevData[prevData.length - 1];
+        
+        // Randomly walk the value
+        const randomChangeUV = (Math.random() - 0.5) * 200;
+        const randomChangePV = (Math.random() - 0.5) * 100;
+        
+        const newTime = parseInt(lastData.time.split(':')[0]);
+        const nextTime = newTime >= 23 ? '00:00' : `${newTime + 1}:00`;
+        
+        newData.push({
+          time: nextTime,
+          uv: Math.max(1000, lastData.uv + randomChangeUV),
+          pv: Math.max(1000, lastData.pv + randomChangePV),
+          amt: lastData.amt
+        });
+        
         return newData;
       });
-    }, 1500);
+      
+      // Also slightly wiggle the opening price
+      setOpeningPrice(prev => prev + (Math.random() - 0.5) * (prev * 0.001));
+    }, 2000);
     return () => clearInterval(interval);
   }, []);
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+  };
 
   const handleAssetChange = (assetName, price) => {
     setActiveAsset(assetName);
@@ -76,26 +126,36 @@ export default function App() {
 
   const handleTrade = (type) => {
     const numAmount = parseFloat(amount || 0);
+    if (numAmount <= 0) {
+      showToast("Please enter a valid amount", "error");
+      return;
+    }
     if (balance >= numAmount) {
       setBalance(prev => prev - numAmount);
-      alert(`Successfully ${type} ${amount} on ${activeAsset}!`);
+      showToast(`Successfully ${type} $${numAmount} of ${activeAsset}`);
     } else {
-      alert("Insufficient balance!");
+      showToast("Insufficient balance for this trade!", "error");
     }
   };
 
   const handleExchange = () => {
     const numAmount = parseFloat(amount || 0);
+    if (numAmount <= 0) {
+      showToast("Please enter a valid amount", "error");
+      return;
+    }
     if (balance >= numAmount) {
        setBalance(prev => prev - numAmount);
-       alert(`Exchanged ${amount} from Balance!`);
+       showToast(`Exchanged $${numAmount} successfully!`);
     } else {
-       alert("Insufficient balance to exchange!");
+       showToast("Insufficient balance to exchange!", "error");
     }
   };
 
   return (
     <div className="trading-dashboard">
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      
       {/* Top Navbar */}
       <header className="top-nav">
         <div className="nav-left">
@@ -111,21 +171,21 @@ export default function App() {
         <div className="nav-center">
           <div className="search-bar">
             <Search size={16} color="var(--text-muted)" />
-            <input type="text" placeholder="Search..." />
+            <input type="text" placeholder="Search markets..." />
           </div>
         </div>
 
         <div className="nav-right">
-          <div className="user-balance">
-            <div>Balance:</div>
+          <div className="user-balance hover-effect" style={{ padding: '4px 8px', borderRadius: '4px' }}>
+            <div style={{ fontSize: '11px' }}>Balance:</div>
             <div className="balance-amount">
               ${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} 
-              <ChevronDown size={12} display="inline" />
+              <ChevronDown size={12} display="inline" style={{marginLeft: '4px'}} />
             </div>
           </div>
           <div className="user-profile">
             <User size={20} />
-            <Settings size={18} color="var(--text-muted)" style={{cursor: 'pointer'}} />
+            <Settings size={18} color="var(--text-muted)" />
           </div>
         </div>
       </header>
@@ -135,11 +195,77 @@ export default function App() {
         {/* Left Side (Charts & Panels) */}
         <div className="left-column">
           
+          {/* Ticker Row */}
+          <div className="tickers-row">
+            <div className="ticker-card hover-effect" onClick={() => handleAssetChange('DASH', 110.01)}>
+              <div className="ticker-info">
+                <div className="coin-icon" style={{ backgroundColor: '#008de4', color: 'white' }}>D</div>
+                <div>
+                  <div className="ticker-name">DASH</div>
+                  <div className="ticker-symbol">Dash</div>
+                </div>
+              </div>
+              <div className="ticker-chart" style={{ height: '40px', width: '80px' }}>
+                 <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={smallAreaChartData}>
+                      <Line type="monotone" dataKey="pv" stroke="#089981" strokeWidth={2} dot={false} isAnimationActive={false} />
+                    </LineChart>
+                 </ResponsiveContainer>
+              </div>
+              <div className="ticker-price">
+                <div className="positive">$110.01</div>
+                <div className="ticker-change positive">+1.45% 12h</div>
+              </div>
+            </div>
+
+            <div className="ticker-card hover-effect" onClick={() => handleAssetChange('LINK', 2.23)}>
+              <div className="ticker-info">
+                <div className="coin-icon" style={{ backgroundColor: '#2a5ada', color: 'white' }}>L</div>
+                <div>
+                  <div className="ticker-name">LINK</div>
+                  <div className="ticker-symbol">Chainlink</div>
+                </div>
+              </div>
+              <div className="ticker-chart" style={{ height: '40px', width: '80px' }}>
+                 <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={smallAreaChartData}>
+                      <Line type="monotone" dataKey="pv" stroke="#089981" strokeWidth={2} dot={false} isAnimationActive={false} />
+                    </LineChart>
+                 </ResponsiveContainer>
+              </div>
+              <div className="ticker-price">
+                <div className="positive">$2.23</div>
+                <div className="ticker-change positive">+3.89% 12h</div>
+              </div>
+            </div>
+
+            <div className="ticker-card hover-effect" onClick={() => handleAssetChange('XRP', 0.508)}>
+              <div className="ticker-info">
+                <div className="coin-icon" style={{ backgroundColor: '#23292f', color: 'white' }}>X</div>
+                <div>
+                  <div className="ticker-name">XRP</div>
+                  <div className="ticker-symbol">Ripple</div>
+                </div>
+              </div>
+              <div className="ticker-chart" style={{ height: '40px', width: '80px' }}>
+                 <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={smallAreaChartDataRed}>
+                      <Line type="monotone" dataKey="pv" stroke="#f23645" strokeWidth={2} dot={false} isAnimationActive={false} />
+                    </LineChart>
+                 </ResponsiveContainer>
+              </div>
+              <div className="ticker-price">
+                <div className="negative">$0.508</div>
+                <div className="ticker-change negative">-4.12% 12h</div>
+              </div>
+            </div>
+          </div>
+
           {/* Main Chart Area */}
           <div className="chart-and-order">
-            <div className="main-chart">
+            <div className="main-chart" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
               {/* Asset Info Header */}
-              <div style={{ display: 'flex', gap: '24px', marginBottom: '16px', fontSize: '13px' }}>
+              <div style={{ display: 'flex', gap: '24px', marginBottom: '16px', fontSize: '13px', flexWrap: 'wrap' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>
                   <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#f23645' }}></div>
                   <span>{activeAsset}</span>
@@ -157,30 +283,33 @@ export default function App() {
                 <div>
                   <span style={{ color: 'var(--text-muted)' }}>Profit </span>
                   <span style={{ color: 'var(--accent-green)', fontWeight: 'bold' }}>
-                     +{(parseFloat(amount || 0) * 0.15).toFixed(2)}
+                     +${(parseFloat(amount || 0) * 0.15).toFixed(2)}
                   </span>
                 </div>
               </div>
               
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }} animationDuration={500}>
-                  <defs>
-                    <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#2962ff" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="#2962ff" stopOpacity={0}/>
-                    </linearGradient>
-                    <pattern id="diagonalHatch" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
-                      <line x1="0" y1="0" x2="0" y2="8" stroke="#10b981" strokeWidth="2" />
-                    </pattern>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
-                  <XAxis dataKey="time" stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis orientation="right" stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
-                  <Tooltip contentStyle={{ backgroundColor: 'var(--bg-panel)', borderColor: 'var(--border)' }} />
-                  <Area type="stepBefore" dataKey="uv" stroke="#2962ff" fillOpacity={1} fill="url(#colorUv)" isAnimationActive={false} />
-                  <Area type="stepBefore" dataKey="pv" stroke="none" fill="url(#diagonalHatch)" fillOpacity={0.3} isAnimationActive={false} />
-                </AreaChart>
-              </ResponsiveContainer>
+              {/* Explicit height wrapper to prevent Recharts collapse */}
+              <div style={{ flex: 1, minHeight: '350px', width: '100%' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} animationDuration={400}>
+                    <defs>
+                      <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#2962ff" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="#2962ff" stopOpacity={0}/>
+                      </linearGradient>
+                      <pattern id="diagonalHatch" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+                        <line x1="0" y1="0" x2="0" y2="8" stroke="#10b981" strokeWidth="2" opacity="0.3" />
+                      </pattern>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+                    <XAxis dataKey="time" stroke="var(--text-muted)" fontSize={11} tickLine={false} axisLine={false} />
+                    <YAxis orientation="right" stroke="var(--text-muted)" fontSize={11} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
+                    <Tooltip contentStyle={{ backgroundColor: 'var(--bg-panel)', borderColor: 'var(--border)', borderRadius: '4px' }} />
+                    <Area type="monotone" dataKey="uv" stroke="#2962ff" strokeWidth={2} fillOpacity={1} fill="url(#colorUv)" isAnimationActive={false} />
+                    <Area type="monotone" dataKey="pv" stroke="none" fill="url(#diagonalHatch)" fillOpacity={1} isAnimationActive={false} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
             </div>
 
             {/* Order Panel */}
@@ -212,7 +341,7 @@ export default function App() {
 
               <div className="form-group">
                 <label>Auto Closing</label>
-                <div className="input-box hover-effect" style={{ justifyContent: 'center', cursor: 'pointer' }}>
+                <div className="input-box hover-effect" style={{ justifyContent: 'center' }}>
                   <span>—</span>
                 </div>
               </div>
@@ -253,6 +382,64 @@ export default function App() {
             ))}
             <div className="tab-item hover-effect" style={{ padding: '12px' }}><Plus size={16} /></div>
           </div>
+
+          {/* Bottom Stats Row */}
+          <div className="bottom-stats">
+            <div className="stat-box">
+              <div className="stat-box-title">Volume Overview</div>
+              <div style={{ flex: 1, minHeight: '120px', width: '100%' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={barChartData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)"/>
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={10} stroke="var(--text-muted)"/>
+                    <YAxis axisLine={false} tickLine={false} fontSize={10} stroke="var(--text-muted)"/>
+                    <defs>
+                       <linearGradient id="barColor" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#ba68c8" />
+                          <stop offset="100%" stopColor="#2962ff" />
+                       </linearGradient>
+                    </defs>
+                    <Bar dataKey="uv" fill="url(#barColor)" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            <div className="stat-box">
+               <div className="stat-box-title">Trend Analysis</div>
+               <div style={{ flex: 1, minHeight: '120px', width: '100%' }}>
+                 <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={barChartData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)"/>
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={10} stroke="var(--text-muted)"/>
+                    <YAxis axisLine={false} tickLine={false} fontSize={10} stroke="var(--text-muted)"/>
+                    <Line type="monotone" dataKey="pv" stroke="#f23645" dot={{r: 2}} strokeWidth={2}/>
+                    <Line type="monotone" dataKey="uv" stroke="#2962ff" dot={{r: 2}} strokeWidth={2}/>
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            <div className="stat-box">
+              <div className="stat-box-title">Market Activity</div>
+              <div style={{ flex: 1, minHeight: '120px', width: '100%' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={barChartData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)"/>
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={10} stroke="var(--text-muted)"/>
+                    <YAxis axisLine={false} tickLine={false} fontSize={10} stroke="var(--text-muted)"/>
+                    <defs>
+                       <linearGradient id="barColor2" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#29b6f6" />
+                          <stop offset="100%" stopColor="#2962ff" />
+                       </linearGradient>
+                    </defs>
+                    <Bar dataKey="pv" fill="url(#barColor2)" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
           
         </div>
 
@@ -288,7 +475,7 @@ export default function App() {
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{crypto.name}</div>
                   </div>
                 </div>
-                <div style={{ flex: 1, height: 35 }}>
+                <div style={{ flex: 1, minHeight: '35px' }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={crypto.isPos ? smallAreaChartData : smallAreaChartDataRed}>
                       <Line type="monotone" dataKey="pv" stroke={crypto.isPos ? '#089981' : '#f23645'} strokeWidth={1.5} dot={false} isAnimationActive={false} />
