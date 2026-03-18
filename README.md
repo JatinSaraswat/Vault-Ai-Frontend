@@ -5,30 +5,48 @@
 
 ---
 
-## 1. Introduction
-Decentralized finance (DeFi) offers high yield opportunities but requires constant monitoring and expertise. Most users struggle to manage risk and optimize returns. VaultAI is an intelligent DeFi wallet that automatically optimizes asset allocation and yield strategies using machine learning.
+## Overview
 
-## 2. Problem Statement
-DeFi users face high complexity, rapid market changes, manual strategy management, and the risk of suboptimal allocation.
+A fully interactive, dark-themed **Trading Platform Dashboard** built with **React + Vite**, featuring live chart animations, real-time market simulation, and a comprehensive order panel.
 
-## 3. Proposed Solution
-VaultAI continuously analyzes market conditions, protocols, and risk metrics to automatically rebalance assets and optimize yield strategies.
+## Tech Stack
 
-## 4. Key Objectives
-- Maximize DeFi yield safely
-- Automate portfolio management
-- Reduce user complexity
-- Adapt to market volatility
+- **Frontend**: React 19, Vite 8
+- **Charts**: Recharts
+- **Icons**: Lucide React
+- **Styling**: Vanilla CSS (dark theme)
 
-## 5. Key Features
-- **Yield Analytics Engine:** Tracks protocol performance.
-- **ML-Based Allocation Model:** Optimizes asset distribution.
-- **Risk Scoring Framework:** Balances yield with safety.
-- **Automated Rebalancing:** Executes strategy adjustments.
-- **User Transparency Dashboard:** Explains decisions clearly.
+## Features
 
-## 6. Real-Time Use Case
-When yield conditions change, VaultAI automatically reallocates funds to maintain optimal returns without user intervention.
+### 📊 Live Market Chart
+- Real-time data simulation via `setInterval` — chart data scrolls continuously every 2 seconds
+- Gradient area chart with auto-updating Y-axis range
 
-## 7. Conclusion
-VaultAI democratizes DeFi investing by combining automation, intelligence, and risk awareness in one wallet.
+### 🪙 Asset Switching
+- **Tickers row** (DASH, LINK, XRP) with mini line charts — clickable to switch active asset
+- **Tab bar** (EUR/USD, Bitcoin, Ethereum, Gold, Oil WTI, Oil Brent) — click to switch charts
+- **Cryptocurrency list** on the right panel — click any coin to focus the main chart on that asset
+
+### 💹 Interactive Order Panel
+- **Amount stepper** — `−` / `+` buttons with smart step sizes (±5 / ±10 / ±100)
+- **Multiplier chips** — x5, x10, x25, x50, x100, x200 — click to select
+- **Auto Closing toggle** — slide to enable / disable with an animated toggle switch
+- **Live countdown timer** — ticks in real time
+- **Buy / Sell** — deduct from account balance with toast notification feedback
+- **Exchange** — triggers a balance deduction with success/error toast
+
+### 🔔 Toast Notification System
+- Animated slide-up toasts replace `alert()` popups
+- Green for success, red for errors — auto-dismiss after 3 seconds
+
+### 💰 Live Balance Tracker
+- Balance in the navigation bar updates in real time as you trade
+
+## Getting Started
+
+```bash
+npm install
+npm run dev
+```
+
+Open [http://localhost:5173](http://localhost:5173) in your browser.
