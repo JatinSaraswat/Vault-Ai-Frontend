@@ -1,132 +1,136 @@
 import React, { useState } from 'react';
-import { Search, ArrowUpRight, ArrowDownRight, TrendingUp, TrendingDown } from 'lucide-react';
-import { LineChart, Line, ResponsiveContainer } from 'recharts';
-import { useNavigate } from 'react-router-dom';
+import { 
+  Search, Filter, TrendingUp, TrendingDown, Info, 
+  Layers, AlertCircle, Zap, Star, ChevronRight, Activity
+} from 'lucide-react';
+import { ResponsiveContainer, LineChart, Line } from 'recharts';
 
-const smallUp = [{ v: 2400 }, { v: 1398 }, { v: 9800 }, { v: 3908 }, { v: 4800 }, { v: 3800 }, { v: 6300 }, { v: 8900 }];
-const smallDown = [{ v: 8900 }, { v: 6398 }, { v: 7800 }, { v: 3908 }, { v: 4800 }, { v: 2800 }, { v: 4300 }, { v: 2400 }];
+const MARKET_DATA = [
+  { id: 1, symbol: 'BTC/USD', name: 'Bitcoin', price: 41509.23, change: '+2.41%', isPos: true, yield: '3.2%', risk: 'Low', category: 'Crypto' },
+  { id: 2, symbol: 'ETH/USD', name: 'Ethereum', price: 2308.24, change: '+1.45%', isPos: true, yield: '12.5%', risk: 'Low', category: 'Crypto' },
+  { id: 3, symbol: 'SOL/USD', name: 'Solana', price: 152.10, change: '+5.33%', isPos: true, yield: '8.2%', risk: 'Medium', category: 'Crypto' },
+  { id: 4, symbol: 'XRP/USD', name: 'Ripple', price: 0.5082, change: '-4.12%', isPos: false, yield: '1.5%', risk: 'High', category: 'Crypto' },
+  { id: 5, symbol: 'EUR/USD', name: 'Euro / US Dollar', price: 1.0842, change: '+0.12%', isPos: true, yield: '0.0%', risk: 'Low', category: 'Forex' },
+  { id: 6, symbol: 'GBP/USD', name: 'Pound / US Dollar', price: 1.2741, change: '-0.08%', isPos: false, yield: '0.0%', risk: 'Low', category: 'Forex' },
+  { id: 7, symbol: 'GOLD', name: 'Gold Spot', price: 2024.50, change: '+0.45%', isPos: true, yield: '0.0%', risk: 'Low', category: 'Commodities' },
+  { id: 8, symbol: 'OIL', name: 'Crude Oil WTI', price: 73.20, change: '-1.22%', isPos: false, yield: '0.0%', risk: 'Medium', category: 'Commodities' },
+];
 
-const allMarkets = [
-  { category: 'Crypto', items: [
-    { symbol: 'BTC/USD', name: 'Bitcoin', price: 41509.23, change: '+2.41%', volume: '24.5B', cap: '812.3B', isPos: true },
-    { symbol: 'ETH/USD', name: 'Ethereum', price: 2308.24, change: '+1.45%', volume: '11.2B', cap: '277.1B', isPos: true },
-    { symbol: 'XRP/USD', name: 'Ripple', price: 0.508, change: '-4.12%', volume: '2.1B', cap: '27.3B', isPos: false },
-    { symbol: 'LTC/USD', name: 'Litecoin', price: 69.72, change: '+1.12%', volume: '540M', cap: '5.1B', isPos: true },
-    { symbol: 'ADA/USD', name: 'Cardano', price: 0.428, change: '-1.22%', volume: '310M', cap: '15.1B', isPos: false },
-    { symbol: 'SOL/USD', name: 'Solana', price: 152.10, change: '+5.33%', volume: '3.4B', cap: '66.7B', isPos: true },
-  ]},
-  { category: 'Forex', items: [
-    { symbol: 'EUR/USD', name: 'Euro / US Dollar', price: 1.0842, change: '+0.12%', volume: '6.6T', cap: '—', isPos: true },
-    { symbol: 'GBP/USD', name: 'Pound / US Dollar', price: 1.2741, change: '-0.08%', volume: '3.8T', cap: '—', isPos: false },
-    { symbol: 'USD/JPY', name: 'US Dollar / Yen', price: 151.84, change: '+0.22%', volume: '4.1T', cap: '—', isPos: true },
-    { symbol: 'AUD/USD', name: 'Australian / US Dollar', price: 0.6521, change: '-0.15%', volume: '1.8T', cap: '—', isPos: false },
-  ]},
-  { category: 'Commodities', items: [
-    { symbol: 'GOLD', name: 'Gold Spot', price: 2338.50, change: '+0.55%', volume: '180B', cap: '—', isPos: true },
-    { symbol: 'SILVER', name: 'Silver Spot', price: 27.42, change: '-0.31%', volume: '14B', cap: '—', isPos: false },
-    { symbol: 'OIL WTI', name: 'Crude Oil WTI', price: 78.31, change: '+1.02%', volume: '22B', cap: '—', isPos: true },
-  ]},
+const miniChartData = [
+  { v: 40 }, { v: 45 }, { v: 42 }, { v: 50 }, { v: 48 }, { v: 55 }, { v: 52 }, { v: 60 }
 ];
 
 export default function Markets() {
+  const [filter, setFilter] = useState('All');
   const [search, setSearch] = useState('');
-  const [activeCategory, setActiveCategory] = useState('All');
-  const navigate = useNavigate();
-  const categories = ['All', 'Crypto', 'Forex', 'Commodities'];
 
-  const filtered = allMarkets
-    .filter(g => activeCategory === 'All' || g.category === activeCategory)
-    .map(g => ({
-      ...g,
-      items: g.items.filter(i =>
-        i.symbol.toLowerCase().includes(search.toLowerCase()) ||
-        i.name.toLowerCase().includes(search.toLowerCase())
-      ),
-    }))
-    .filter(g => g.items.length > 0);
+  const filteredData = MARKET_DATA.filter(item => {
+    const matchesFilter = filter === 'All' || item.category === filter;
+    const matchesSearch = item.symbol.toLowerCase().includes(search.toLowerCase()) || 
+                          item.name.toLowerCase().includes(search.toLowerCase());
+    return matchesFilter && matchesSearch;
+  });
 
   return (
-    <div className="page-container">
-      <div className="page-header">
+    <div className="main-content">
+      <div className="ai-header" style={{ marginBottom: '12px' }}>
         <div>
-          <h1 className="page-title">Markets</h1>
-          <p className="page-subtitle">Live prices across all asset classes</p>
+          <h2 style={{ fontSize: '20px', fontWeight: '700' }}>Smart Market Explorer</h2>
+          <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>AI-filtered opportunities & yield-bearing assets</p>
         </div>
-        <div className="page-search">
-          <Search size={15} color="var(--text-muted)" />
-          <input
-            type="text"
-            placeholder="Search symbol or name..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-        </div>
-      </div>
-
-      <div className="category-tabs">
-        {categories.map(c => (
-          <button
-            key={c}
-            className={`category-tab ${activeCategory === c ? 'active' : ''}`}
-            onClick={() => setActiveCategory(c)}
-          >{c}</button>
-        ))}
-      </div>
-
-      <div className="markets-table-wrapper">
-        <table className="markets-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Symbol</th>
-              <th>Name</th>
-              <th>Price</th>
-              <th>24h Change</th>
-              <th>Volume</th>
-              <th>Market Cap</th>
-              <th>Trend</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map(group => (
-              <React.Fragment key={group.category}>
-                <tr className="category-row">
-                  <td colSpan={9}>{group.category}</td>
-                </tr>
-                {group.items.map((item, idx) => (
-                  <tr key={item.symbol} className="market-row" onClick={() => navigate('/')}>
-                    <td className="row-num">{idx + 1}</td>
-                    <td className="symbol-cell">
-                      <div className="market-coin-icon">{item.symbol.charAt(0)}</div>
-                      <span className="symbol-text">{item.symbol}</span>
-                    </td>
-                    <td className="name-cell">{item.name}</td>
-                    <td className="price-cell">
-                      {item.price < 10 ? item.price.toFixed(4) : item.price.toLocaleString()}
-                    </td>
-                    <td className={item.isPos ? 'positive change-cell' : 'negative change-cell'}>
-                      {item.isPos ? <ArrowUpRight size={13} /> : <ArrowDownRight size={13} />}
-                      {item.change}
-                    </td>
-                    <td className="muted-cell">{item.volume}</td>
-                    <td className="muted-cell">{item.cap}</td>
-                    <td className="trend-cell">
-                      <ResponsiveContainer width={80} height={36}>
-                        <LineChart data={item.isPos ? smallUp : smallDown}>
-                          <Line type="monotone" dataKey="v" stroke={item.isPos ? '#089981' : '#f23645'} strokeWidth={1.5} dot={false} isAnimationActive={false} />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </td>
-                    <td>
-                      <button className="trade-now-btn" onClick={e => { e.stopPropagation(); navigate('/'); }}>Trade</button>
-                    </td>
-                  </tr>
-                ))}
-              </React.Fragment>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <div className="chart-controls">
+            {['All', 'Crypto', 'Forex', 'Commodities'].map(f => (
+              <button 
+                key={f} 
+                className={`chart-ctrl-btn ${filter === f ? 'active' : ''}`}
+                onClick={() => setFilter(f)}
+              >{f}</button>
             ))}
-          </tbody>
-        </table>
+          </div>
+        </div>
+      </div>
+
+      <div className="glass-panel" style={{ flex: 1, padding: '20px', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', background: 'var(--bg-main)', padding: '8px 16px', borderRadius: '10px', border: '1px solid var(--border)', width: '300px', alignItems: 'center', gap: '8px' }}>
+            <Search size={14} color="var(--text-muted)" />
+            <input 
+              type="text" 
+              placeholder="Filter by symbol or name..." 
+              style={{ background: 'none', border: 'none', color: 'white', outline: 'none', fontSize: '12px', width: '100%' }}
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </div>
+          <div className="impact-badge positive">
+            <Activity size={12} /> AI Scanning 842 Markets...
+          </div>
+        </div>
+
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <thead>
+              <tr style={{ color: 'var(--text-muted)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                <th style={{ padding: '12px' }}>Asset</th>
+                <th style={{ padding: '12px' }}>Price</th>
+                <th style={{ padding: '12px' }}>24h Change</th>
+                <th style={{ padding: '12px' }}>AI Yield Est.</th>
+                <th style={{ padding: '12px' }}>Risk Assessment</th>
+                <th style={{ padding: '12px' }}>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredData.map(item => (
+                <tr key={item.id} className="smart-item" style={{ borderBottom: '1px solid var(--border)', cursor: 'default' }}>
+                  <td style={{ padding: '16px 12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div className="sidebar-logo" style={{ width: 32, height: 32, fontSize: '12px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', boxShadow: 'none' }}>
+                        {item.symbol.charAt(0)}
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: '700', fontSize: '13px' }}>{item.symbol}</div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{item.name}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td style={{ padding: '16px 12px', fontWeight: '600' }}>
+                    ${item.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  </td>
+                  <td style={{ padding: '16px 12px' }}>
+                    <div style={{ color: item.isPos ? 'var(--accent-green)' : 'var(--accent-red)', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '600' }}>
+                      {item.isPos ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                      {item.change}
+                    </div>
+                  </td>
+                  <td style={{ padding: '16px 12px' }}>
+                    {item.yield !== '0.0%' ? (
+                      <div className="impact-badge positive" style={{ background: 'rgba(0, 255, 195, 0.05)' }}>
+                        <Zap size={10} /> {item.yield}
+                      </div>
+                    ) : (
+                      <span style={{ color: 'var(--text-muted)' }}>-</span>
+                    )}
+                  </td>
+                  <td style={{ padding: '16px 12px' }}>
+                    <div style={{ 
+                      display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: '600',
+                      background: item.risk === 'Low' ? 'rgba(0, 255, 195, 0.05)' : item.risk === 'Medium' ? 'rgba(255, 157, 0, 0.05)' : 'rgba(255, 62, 94, 0.05)',
+                      color: item.risk === 'Low' ? 'var(--accent-green)' : item.risk === 'Medium' ? 'var(--accent-orange)' : 'var(--accent-red)'
+                     }}>
+                      <Shield size={10} /> {item.risk} Risk
+                    </div>
+                  </td>
+                  <td style={{ padding: '16px 12px' }}>
+                    <button className="ai-btn-secondary" style={{ padding: '6px 14px', fontSize: '11px' }}>
+                      Monitor
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
