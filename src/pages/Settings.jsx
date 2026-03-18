@@ -1,107 +1,122 @@
 import React, { useState } from 'react';
-import { Moon, Sun, Bell, Shield, Globe, CreditCard, Key, ChevronRight, Smartphone, Eye, EyeOff } from 'lucide-react';
+import { 
+  Settings, Monitor, Bell, Shield, User, CreditCard, 
+  Key, LogOut, Brain, Zap, Sliders, Info, Cpu
+} from 'lucide-react';
 
-const ToggleRow = ({ label, desc, value, onChange }) => (
-  <div className="settings-row">
-    <div>
-      <div style={{fontWeight:500}}>{label}</div>
-      {desc && <div style={{fontSize:11, color:'var(--text-muted)', marginTop:2}}>{desc}</div>}
-    </div>
-    <button className={`toggle-btn ${value ? 'toggle-on' : ''}`} onClick={() => onChange(!value)}>
-      <span className="toggle-thumb"/>
-    </button>
-  </div>
-);
-
-const LinkRow = ({ icon: Icon, label, desc, badge }) => (
-  <div className="settings-row clickable">
-    <div style={{display:'flex', alignItems:'center', gap:10}}>
-      <div className="settings-icon-wrap"><Icon size={15}/></div>
-      <div>
-        <div style={{fontWeight:500}}>{label}</div>
-        {desc && <div style={{fontSize:11, color:'var(--text-muted)', marginTop:2}}>{desc}</div>}
-      </div>
-    </div>
-    <div style={{display:'flex', alignItems:'center', gap:8}}>
-      {badge && <span className="settings-badge">{badge}</span>}
-      <ChevronRight size={15} color="var(--text-muted)"/>
-    </div>
-  </div>
-);
-
-export default function Settings() {
-  const [darkMode, setDarkMode] = useState(true);
-  const [notifications, setNotifications] = useState(true);
-  const [emailAlerts, setEmailAlerts] = useState(false);
-  const [smsAlerts, setSmsAlerts] = useState(false);
-  const [twoFA, setTwoFA] = useState(true);
-  const [biometric, setBiometric] = useState(false);
-  const [currency, setCurrency] = useState('USD');
-  const [language, setLanguage] = useState('English');
+export default function SettingsPage() {
+  const [autoPilot, setAutoPilot] = useState(true);
+  const [riskLevel, setRiskLevel] = useState(65);
 
   return (
-    <div className="page-container">
-      <div className="page-header">
+    <div className="main-content">
+      <div className="ai-header" style={{ marginBottom: '12px' }}>
         <div>
-          <h1 className="page-title">Settings</h1>
-          <p className="page-subtitle">Customize your trading platform experience</p>
+          <h2 style={{ fontSize: '20px', fontWeight: '700' }}>AI Configuration</h2>
+          <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Manage system logic, risk parameters, and auto-pilot modes</p>
+        </div>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button className="ai-btn-secondary" style={{ padding: '8px 16px', fontSize: '12px' }}>Reset Defaults</button>
+          <button className="ai-btn-primary" style={{ padding: '8px 24px', fontSize: '12px' }}>Save Changes</button>
         </div>
       </div>
 
-      <div className="settings-grid">
-        {/* Appearance */}
-        <div className="settings-section">
-          <div className="settings-section-title">
-            {darkMode ? <Moon size={14}/> : <Sun size={14}/>} Appearance
+      <div className="content-row-full">
+        {/* AI System Settings */}
+        <div className="glass-panel ai-card">
+          <div className="ai-card-title">
+            <Cpu size={14} color="var(--accent-blue)" /> Core Logic Engine
           </div>
-          <ToggleRow label="Dark Mode" desc="Use dark theme across all pages" value={darkMode} onChange={setDarkMode}/>
-          <div className="settings-row">
-            <div>
-              <div style={{fontWeight:500}}>Currency</div>
-              <div style={{fontSize:11, color:'var(--text-muted)', marginTop:2}}>Display currency</div>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '10px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <div style={{ fontSize: '14px', fontWeight: '600' }}>AI Auto-Pilot</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Allow VaultAI to execute rebalances automatically</div>
+              </div>
+              <button 
+                onClick={() => setAutoPilot(!autoPilot)}
+                style={{ width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer', position: 'relative', background: autoPilot ? 'var(--accent-blue)' : 'var(--bg-panel-hover)', transition: '0.3s' }}
+              >
+                <div style={{ width: 18, height: 18, borderRadius: '50%', background: 'white', position: 'absolute', top: 3, left: autoPilot ? 23 : 3, transition: '0.3s' }} />
+              </button>
             </div>
-            <select className="settings-select" value={currency} onChange={e => setCurrency(e.target.value)}>
-              {['USD', 'EUR', 'GBP', 'JPY', 'INR'].map(c => <option key={c}>{c}</option>)}
-            </select>
+
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ fontSize: '13px', fontWeight: '600' }}>Risk Tolerance</span>
+                <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--accent-blue)' }}>{riskLevel}%</span>
+              </div>
+              <input 
+                type="range" 
+                min="0" max="100" value={riskLevel} 
+                onChange={(e) => setRiskLevel(e.target.value)}
+                style={{ width: '100%', height: '4px', appearance: 'none', background: 'var(--border)', borderRadius: '2px', outline: 'none' }}
+              />
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'var(--text-muted)', marginTop: '6px' }}>
+                <span>Conservative</span> <span>Aggressive</span>
+              </div>
+            </div>
+
+            <div>
+              <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '10px' }}>Inference Model</div>
+              <select style={{ width: '100%', background: 'var(--bg-main)', border: '1px solid var(--border)', color: 'white', padding: '10px', borderRadius: '8px', outline: 'none', fontSize: '12px' }}>
+                <option>Vault-Engine V4 (Optimized for Yield)</option>
+                <option>GPT-4o (Standard Logic)</option>
+                <option>Claude 3.5 Sonnet (High Reasoning)</option>
+              </select>
+            </div>
           </div>
-          <div className="settings-row">
-            <div>
-              <div style={{fontWeight:500}}>Language</div>
-              <div style={{fontSize:11, color:'var(--text-muted)', marginTop:2}}>Interface language</div>
-            </div>
-            <select className="settings-select" value={language} onChange={e => setLanguage(e.target.value)}>
-              {['English', 'Spanish', 'French', 'German', 'Japanese'].map(l => <option key={l}>{l}</option>)}
-            </select>
+        </div>
+
+        {/* Security & Access */}
+        <div className="glass-panel ai-card">
+          <div className="ai-card-title">
+            <Shield size={14} color="var(--accent-green)" /> Security & Bio-Auth
+          </div>
+          <div className="smart-list" style={{ marginTop: '10px' }}>
+            {[
+              { label: 'Two-Factor (2FA)', status: 'Enabled', icon: Shield, color: 'var(--accent-green)' },
+              { label: 'Biometric Login', status: 'Disabled', icon: User, color: 'var(--text-muted)' },
+              { label: 'API Access Keys', status: '3 Active', icon: Key, color: 'var(--accent-blue)' },
+            ].map((item, i) => (
+              <div key={i} className="smart-item" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <item.icon size={16} color={item.color} />
+                  <span style={{ fontSize: '13px', fontWeight: '500' }}>{item.label}</span>
+                </div>
+                <span style={{ fontSize: '11px', fontWeight: '700', color: item.color }}>{item.status}</span>
+              </div>
+            ))}
+            <button className="ai-btn-secondary" style={{ marginTop: '10px', width: '100%', fontSize: '12px', padding: '10px' }}>Change Access Password</button>
           </div>
         </div>
 
         {/* Notifications */}
-        <div className="settings-section">
-          <div className="settings-section-title"><Bell size={14}/> Notifications</div>
-          <ToggleRow label="Push Notifications" desc="Real-time alerts in the app" value={notifications} onChange={setNotifications}/>
-          <ToggleRow label="Email Alerts" desc="Price alerts via email" value={emailAlerts} onChange={setEmailAlerts}/>
-          <ToggleRow label="SMS Alerts" desc="Critical alerts via SMS" value={smsAlerts} onChange={setSmsAlerts}/>
-        </div>
-
-        {/* Security */}
-        <div className="settings-section">
-          <div className="settings-section-title"><Shield size={14}/> Security</div>
-          <ToggleRow label="Two-Factor Authentication" desc="Extra login security layer" value={twoFA} onChange={setTwoFA}/>
-          <ToggleRow label="Biometric Login" desc="Use fingerprint or Face ID" value={biometric} onChange={setBiometric}/>
-          <LinkRow icon={Key} label="Change Password" desc="Last changed 30 days ago"/>
-          <LinkRow icon={Smartphone} label="Trusted Devices" desc="3 devices authorized" badge="3"/>
-        </div>
-
-        {/* Account */}
-        <div className="settings-section">
-          <div className="settings-section-title"><CreditCard size={14}/> Account</div>
-          <LinkRow icon={CreditCard} label="Payment Methods" desc="Manage linked cards & wallets" badge="2"/>
-          <LinkRow icon={Globe} label="KYC Verification" desc="Identity verified" badge="✓"/>
-          <LinkRow icon={Shield} label="API Keys" desc="Manage trading API access"/>
-          <div className="settings-row">
-            <button className="danger-btn">Delete Account</button>
-            <button className="logout-btn">Log Out</button>
+        <div className="glass-panel ai-card">
+          <div className="ai-card-title">
+            <Bell size={14} color="var(--accent-orange)" /> Alert Configuration
           </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '10px' }}>
+            {[
+              { label: 'AI Rebalance Alerts', desc: 'Notify on every automated move' },
+              { label: 'Risk Level Changes', desc: 'Warn if portfolio risk exceeds limit' },
+              { label: 'Yield Pool Updates', desc: 'Alert when pool yields drop > 2%' },
+            ].map((item, i) => (
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: '600' }}>{item.label}</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{item.desc}</div>
+                </div>
+                <div style={{ width: 36, height: 18, borderRadius: 9, background: 'var(--accent-blue)', position: 'relative' }}>
+                  <div style={{ width: 14, height: 14, borderRadius: '50%', background: 'white', position: 'absolute', top: 2, right: 2 }} />
+                </div>
+              </div>
+            ))}
+          </div>
+          <button className="ai-btn-secondary" style={{ marginTop: '20px', width: '100%', color: 'var(--accent-red)', border: '1px solid rgba(255, 62, 94, 0.2)' }}>
+            <LogOut size={14} /> Terminate AI Session
+          </button>
         </div>
       </div>
     </div>
