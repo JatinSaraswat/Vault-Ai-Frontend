@@ -118,11 +118,13 @@ function AIInsightsBox() {
   useEffect(() => {
     // Simulate ML insight generation
     const mockPortfolio = { assets: [{ name: 'ETH', yield: '12.5%', risk: 'Low' }] };
-    setInsight(mlEngine.getInsight(mockPortfolio, 'BULLISH'));
-    setMetrics({ 
-      return: mlEngine.predictMarket('ETH').confidence / 50, 
-      risk: (Math.random() * 15 + 5).toFixed(0) 
-    });
+    setTimeout(() => {
+      setInsight(mlEngine.getInsight(mockPortfolio, 'BULLISH'));
+      setMetrics({ 
+        return: mlEngine.predictMarket('ETH').confidence / 50, 
+        risk: (Math.random() * 15 + 5).toFixed(0) 
+      });
+    }, 0);
   }, []);
 
   return (
@@ -152,10 +154,12 @@ function AIActionPanel({ onApply }) {
 
   useEffect(() => {
     const pred = mlEngine.predictMarket('XRP');
-    setAiConfidence(pred.confidence);
-    if (pred.trend === 'BEARISH') {
-      setRecommendation({ from: 'XRP', to: 'ETH', reason: 'Bearish divergence detected' });
-    }
+    setTimeout(() => {
+      setAiConfidence(pred.confidence);
+      if (pred.trend === 'BEARISH') {
+        setRecommendation({ from: 'XRP', to: 'ETH', reason: 'Bearish divergence detected' });
+      }
+    }, 0);
   }, []);
 
   return (
