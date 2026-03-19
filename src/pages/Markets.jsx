@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Search, Filter, TrendingUp, TrendingDown, Info, 
   Layers, AlertCircle, Zap, Star, ChevronRight, Activity, Shield
@@ -19,8 +19,21 @@ const MARKET_DATA = [
 export default function Markets() {
   const [filter, setFilter] = useState('All');
   const [search, setSearch] = useState('');
+  const [markets, setMarkets] = useState(MARKET_DATA);
 
-  const filteredData = MARKET_DATA.filter(item => {
+  useEffect(() => {
+    fetch("http://localhost:8080/api/markets")
+      .then(res => res.json())
+      .then(data => {
+        console.log(data);
+        if (Array.isArray(data)) {
+          setMarkets(data);
+        }
+      })
+      .catch(err => console.error("Market fetch failed:", err));
+  }, []);
+
+  const filteredData = markets.filter(item => {
     const matchesFilter = filter === 'All' || item.category === filter;
     const matchesSearch = item.symbol.toLowerCase().includes(search.toLowerCase()) || 
                           item.name.toLowerCase().includes(search.toLowerCase());
