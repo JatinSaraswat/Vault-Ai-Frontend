@@ -6,15 +6,15 @@
   --bg-panel-hover: rgba(30, 35, 45, 0.8);
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
-  --accent-blue: #00d2ff;
-  --accent-green: #00ffc3;
-  --accent-red: #ff3e5e;
-  --accent-orange: #ff9d00;
+  --accent-blue: #06b6d4;
+  --accent-green: #22c55e;
+  --accent-red: #ef4444;
+  --accent-orange: #f59e0b;
   --accent-purple: #9d50bb;
   --border: rgba(255, 255, 255, 0.05);
   --glass-border: rgba(255, 255, 255, 0.1);
-  --neon-glow: 0 0 15px rgba(0, 210, 255, 0.4);
-  --neon-glow-green: 0 0 15px rgba(0, 255, 195, 0.3);
+  --neon-glow: 0 0 15px rgba(6, 182, 212, 0.4);
+  --neon-glow-green: 0 0 15px rgba(34, 197, 94, 0.3);
 }
 
 * {
