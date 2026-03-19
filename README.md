@@ -34,6 +34,12 @@ VaultAI is designed to simplify complex financial management by putting an AI "A
 - **Yield & Risk Flags**: Markets are augmented with "AI Yield Est." and "Risk Assessment" indicators.
 - **Sentiment Monitor**: The Watchlist page acts as an AI asset monitor with bullish/bearish sentiment scores.
 
+## 🧠 Centralized ML Intelligence
+All "AI" features are powered by a custom-built **ML Intelligence Engine** (`src/services/mlEngine.js`). This service simulates real-world backend logic for:
+- **Aggregate Risk Analysis**: Calculation of portfolio-wide volatility scores.
+- **Market Sentiment Projection**: Real-time bullish/bearish forecasting for major assets.
+- **Allocation Optimization**: Algorithmic generation of target asset weights.
+
 ## 🛠 Tech Stack
 - **Frontend**: React 19, Vite 8, React Router 7
 - **Visualization**: Recharts (with custom prediction overlays)
