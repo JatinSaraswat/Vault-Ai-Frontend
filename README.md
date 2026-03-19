@@ -18,7 +18,7 @@ VaultAI is designed to simplify complex financial management by putting an AI "A
 
 ### 🧠 AI Command Center (App Shell)
 - **AI Control Panel**: Displays system status (ACTIVE), current strategy (Balanced Growth), and risk tolerance at a glance.
-- **AI Sidebar**: Sleek, minimalist navigation providing quick access to all VaultAI sectors.
+- **Dynamic Expanding Sidebar**: A state-of-the-art navigation shell that expands on hover to reveal labels and brand identity, while staying minimalist in its collapsed state.
 
 ### 📊 Predictive Dashboard
 - **AI Portfolio Chart**: Combines historical data with dashed **AI Prediction Lines** for future performance forecasting.
@@ -32,6 +32,7 @@ VaultAI is designed to simplify complex financial management by putting an AI "A
 
 ### 🧭 Smart Market Explorer
 - **Yield & Risk Flags**: Markets are augmented with "AI Yield Est." and "Risk Assessment" indicators.
+- **Live Backend Integration**: Real-time market data is fetched directly from the backend API (`http://localhost:8080/api/markets`) ensuring current valuation and trend accuracy.
 - **Sentiment Monitor**: The Watchlist page acts as an AI asset monitor with bullish/bearish sentiment scores.
 
 ## 🧠 Centralized ML Intelligence
