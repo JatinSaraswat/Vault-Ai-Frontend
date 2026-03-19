@@ -3,6 +3,7 @@ import {
   Star, Bell, Trash2, TrendingUp, TrendingDown, 
   Brain, Zap, Shield, Info, AlertTriangle, Activity
 } from 'lucide-react';
+import { mlEngine } from '../services/mlEngine';
 
 const WATCHLIST_DATA = [
   { id: 1, symbol: 'BTC', name: 'Bitcoin', price: '$41,509', sentiment: 'Bullish', sentimentScore: 82, trend: 'up' },
@@ -60,10 +61,18 @@ export default function Watchlist() {
             <div style={{ margin: '20px 0' }}>
               <div style={{ fontSize: '24px', fontWeight: '800' }}>{item.price}</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
-                {item.trend === 'up' ? <TrendingUp size={14} color="var(--accent-green)" /> : <TrendingDown size={14} color="var(--accent-red)" />}
-                <span style={{ fontSize: '12px', color: item.trend === 'up' ? 'var(--accent-green)' : 'var(--accent-red)' }}>
-                  {item.trend === 'up' ? '+4.2% AI Forecast' : '-2.1% AI Forecast'}
-                </span>
+                {(() => {
+                  const pred = mlEngine.predictMarket(item.symbol);
+                  const isUp = pred.trend === 'BULLISH';
+                  return (
+                    <>
+                      {isUp ? <TrendingUp size={14} color="var(--accent-green)" /> : <TrendingDown size={14} color="var(--accent-red)" />}
+                      <span style={{ fontSize: '12px', color: isUp ? 'var(--accent-green)' : 'var(--accent-red)' }}>
+                        {isUp ? `+${pred.predictedMove}% AI Forecast` : `${pred.predictedMove}% AI Forecast`}
+                      </span>
+                    </>
+                  );
+                })()}
               </div>
             </div>
 
@@ -71,21 +80,30 @@ export default function Watchlist() {
               <div className="ai-card-title" style={{ fontSize: '9px', marginBottom: '8px' }}>
                 <Zap size={10} color="var(--accent-blue)" /> Sentiment Analysis
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ 
-                  fontSize: '13px', fontWeight: '700',
-                  color: item.sentiment === 'Bullish' ? 'var(--accent-green)' : item.sentiment === 'Bearish' ? 'var(--accent-red)' : 'var(--text-muted)'
-                }}>
-                  {item.sentiment}
-                </span>
-                <span style={{ fontSize: '12px', fontWeight: '600' }}>{item.sentimentScore}%</span>
-              </div>
-              <div className="risk-meter-container" style={{ height: '4px', marginTop: '8px' }}>
-                <div className="risk-meter-fill" style={{ 
-                  width: `${item.sentimentScore}%`, 
-                  background: item.sentiment === 'Bullish' ? 'var(--accent-green)' : item.sentiment === 'Bearish' ? 'var(--accent-red)' : 'var(--accent-blue)' 
-                }}></div>
-              </div>
+              {(() => {
+                const pred = mlEngine.predictMarket(item.symbol);
+                const sentiment = pred.trend === 'BULLISH' ? 'Bullish' : 'Bearish';
+                const score = pred.confidence;
+                return (
+                  <>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ 
+                        fontSize: '13px', fontWeight: '700',
+                        color: sentiment === 'Bullish' ? 'var(--accent-green)' : 'var(--accent-red)'
+                      }}>
+                        {sentiment}
+                      </span>
+                      <span style={{ fontSize: '12px', fontWeight: '600' }}>{score}%</span>
+                    </div>
+                    <div className="risk-meter-container" style={{ height: '4px', marginTop: '8px' }}>
+                      <div className="risk-meter-fill" style={{ 
+                        width: `${score}%`, 
+                        background: sentiment === 'Bullish' ? 'var(--accent-green)' : 'var(--accent-red)'
+                      }}></div>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
 
             <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>

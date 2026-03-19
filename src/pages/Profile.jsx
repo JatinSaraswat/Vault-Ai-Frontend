@@ -4,6 +4,7 @@ import {
   Award, TrendingUp, Shield, Brain, Zap, CheckCircle
 } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { mlEngine } from '../services/mlEngine';
 
 const PERFORMANCE_DATA = [
   { month: 'Jan', pnl: 840 },
@@ -22,7 +23,7 @@ const PERFORMANCE_DATA = [
 
 export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
-  const [userInfo, setUserInfo] = useState({
+  const [userInfo] = useState({
     name: 'Alex Johnson',
     email: 'alex.johnson@vault.ai',
     phone: '+1 (555) 234-5678',
@@ -107,16 +108,23 @@ export default function Profile() {
             <div className="ai-card-title">
               <Brain size={14} color="var(--accent-blue)" /> System Trust Score
             </div>
-            <div style={{ textAlign: 'center', padding: '10px 0' }}>
-              <div style={{ fontSize: '42px', fontWeight: '800', color: 'var(--accent-blue)' }}>98.4<span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>%</span></div>
-              <div style={{ color: 'var(--accent-green)', fontWeight: '600', fontSize: '13px', marginTop: '4px' }}>EXCELLENCE LEVEL</div>
-              <div className="risk-meter-container" style={{ height: '8px', marginTop: '16px' }}>
-                <div className="risk-meter-fill" style={{ width: '98.4%', background: 'var(--accent-blue)' }}></div>
-              </div>
-              <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '12px' }}>
-                Based on 1,420 successful AI rebalances and zero liquidate events.
-              </p>
-            </div>
+            {(() => {
+              const baseScore = 94.2; // Base system stability
+              const marketMultiplier = mlEngine.predictMarket('BTC').confidence / 100;
+              const trustScore = (baseScore + (marketMultiplier * 5)).toFixed(1);
+              return (
+                <div style={{ textAlign: 'center', padding: '10px 0' }}>
+                  <div style={{ fontSize: '42px', fontWeight: '800', color: 'var(--accent-blue)' }}>{trustScore}<span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>%</span></div>
+                  <div style={{ color: 'var(--accent-green)', fontWeight: '600', fontSize: '13px', marginTop: '4px' }}>EXCELLENCE LEVEL</div>
+                  <div className="risk-meter-container" style={{ height: '8px', marginTop: '16px' }}>
+                    <div className="risk-meter-fill" style={{ width: `${trustScore}%`, background: 'var(--accent-blue)' }}></div>
+                  </div>
+                  <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '12px' }}>
+                    Based on 1,420 successful AI rebalances and zero liquidate events.
+                  </p>
+                </div>
+              );
+            })()}
           </div>
 
           <div className="glass-panel ai-card" style={{ flex: 1 }}>
