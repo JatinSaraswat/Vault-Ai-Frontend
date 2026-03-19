@@ -8,6 +8,8 @@ import {
   CartesianGrid, XAxis, YAxis, Tooltip
 } from 'recharts';
 
+import { mlEngine } from '../services/mlEngine';
+
 const PORTFOLIO_DATA = [
   { name: 'BTC', value: 46.7, color: '#f59e0b', current: 9962.21, recommended: 50.0 },
   { name: 'ETH', value: 37.9, color: 'var(--accent-blue)', current: 8078.84, recommended: 35.0 },
@@ -23,7 +25,8 @@ const HISTORY = [
 ];
 
 export default function Portfolio() {
-  const [activeTab, setActiveTab] = useState('allocation');
+  const [analysis] = useState(mlEngine.analyzePortfolio(PORTFOLIO_DATA));
+  const [optimizedData] = useState(mlEngine.optimizeAllocation(PORTFOLIO_DATA));
 
   return (
     <div className="main-content" style={{ paddingBottom: '24px' }}>
@@ -40,9 +43,9 @@ export default function Portfolio() {
           {/* Summary Cards */}
           <div className="content-row-full" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
             {[
-              { label: 'Total Value', val: '$21,350.25', sub: '+21.9% all time', col: 'var(--accent-blue)' },
-              { label: 'AI Yield (MTD)', val: '+$840.12', sub: '+4.2% yield', col: 'var(--accent-green)' },
-              { label: 'Risk Score', val: '65/100', sub: 'Medium Risk', col: 'var(--accent-orange)' },
+              { label: 'Total Value', val: `$${analysis.totalValue.toLocaleString()}`, sub: '+21.9% all time', col: 'var(--accent-blue)' },
+              { label: 'AI Yield (MTD)', val: `+${analysis.avgYield}%`, sub: 'Projected yield', col: 'var(--accent-green)' },
+              { label: 'Risk Score', val: `${analysis.riskScore}/100`, sub: `${analysis.riskLevel} RISK`, col: analysis.riskScore > 60 ? 'var(--accent-orange)' : 'var(--accent-green)' },
               { label: 'Efficiency', val: '94%', sub: 'High Optimization', col: 'var(--accent-blue)' },
             ].map((stat, i) => (
               <div key={i} className="glass-panel ai-card" style={{ padding: '16px' }}>
@@ -63,7 +66,7 @@ export default function Portfolio() {
               <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr 1fr', padding: '0 12px', marginBottom: '8px', fontSize: '10px', color: 'var(--text-muted)' }}>
                 <span>ASSET</span> <span>CURRENT WEIGHT</span> <span>AI TARGET</span>
               </div>
-              {PORTFOLIO_DATA.map((item, i) => (
+              {optimizedData.map((item, i) => (
                 <div key={i} className="smart-item" style={{ display: 'grid', gridTemplateColumns: '100px 1fr 1fr', cursor: 'default' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <div style={{ width: 8, height: 8, borderRadius: '2px', background: item.color }}></div>
@@ -79,7 +82,7 @@ export default function Portfolio() {
                   </div>
                   <div style={{ paddingRight: '20px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '4px' }}>
-                      <span>{item.recommended}%</span>
+                      <span>{item.recommended.toFixed(1)}%</span>
                       {item.recommended > item.value ? 
                         <span style={{color: 'var(--accent-green)'}}>Increase</span> : 
                         <span style={{color: 'var(--accent-red)'}}>Reduce</span>}
@@ -101,13 +104,13 @@ export default function Portfolio() {
               <Shield size={14} color="var(--accent-blue)" /> Risk Analysis
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '36px', fontWeight: '800', color: 'var(--accent-blue)' }}>65</div>
-              <div style={{ color: 'var(--accent-orange)', fontWeight: '600', fontSize: '12px' }}>MODERATE RISK</div>
+              <div style={{ fontSize: '36px', fontWeight: '800', color: 'var(--accent-blue)' }}>{analysis.riskScore}</div>
+              <div style={{ color: analysis.riskScore > 60 ? 'var(--accent-orange)' : 'var(--accent-green)', fontWeight: '600', fontSize: '12px' }}>{analysis.riskLevel} RISK</div>
               <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '8px' }}>
-                Your portfolio is slightly over-exposed to BTC. AI suggests rebalancing to Stablecoins.
+                {mlEngine.getInsight({ assets: PORTFOLIO_DATA }, 'BULLISH')}
               </div>
               <div className="risk-meter-container" style={{ height: '10px', marginTop: '16px' }}>
-                <div className="risk-meter-fill" style={{ width: '65%', background: 'linear-gradient(90deg, var(--accent-green) 0%, var(--accent-orange) 50%, var(--accent-red) 100%)' }}></div>
+                <div className="risk-meter-fill" style={{ width: `${analysis.riskScore}%`, background: 'linear-gradient(90deg, var(--accent-green) 0%, var(--accent-orange) 50%, var(--accent-red) 100%)' }}></div>
               </div>
             </div>
           </div>

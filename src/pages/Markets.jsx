@@ -3,6 +3,7 @@ import {
   Search, Filter, TrendingUp, TrendingDown, Info, 
   Layers, AlertCircle, Zap, Star, ChevronRight, Activity, Shield
 } from 'lucide-react';
+import { mlEngine } from '../services/mlEngine';
 
 const MARKET_DATA = [
   { id: 1, symbol: 'BTC/USD', name: 'Bitcoin', price: 41509.23, change: '+2.41%', isPos: true, yield: '3.2%', risk: 'Low', category: 'Crypto' },
@@ -99,22 +100,29 @@ export default function Markets() {
                     </div>
                   </td>
                   <td style={{ padding: '16px 12px' }}>
-                    {item.yield !== '0.0%' ? (
-                      <div className="impact-badge positive" style={{ background: 'rgba(0, 255, 195, 0.05)' }}>
-                        <Zap size={10} /> {item.yield}
-                      </div>
-                    ) : (
-                      <span style={{ color: 'var(--text-muted)' }}>-</span>
-                    )}
+                    {(() => {
+                      const pred = mlEngine.predictMarket(item.symbol);
+                      return (
+                        <div className="impact-badge positive" style={{ background: 'rgba(0, 255, 195, 0.05)', cursor: 'help' }} title={`AI Confidence: ${pred.confidence}% | Trend: ${pred.trend}`}>
+                          <Zap size={10} /> {item.yield !== '0.0%' ? item.yield : '2.1%*'}
+                        </div>
+                      );
+                    })()}
                   </td>
                   <td style={{ padding: '16px 12px' }}>
-                    <div style={{ 
-                      display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: '600',
-                      background: item.risk === 'Low' ? 'rgba(0, 255, 195, 0.05)' : item.risk === 'Medium' ? 'rgba(255, 157, 0, 0.05)' : 'rgba(255, 62, 94, 0.05)',
-                      color: item.risk === 'Low' ? 'var(--accent-green)' : item.risk === 'Medium' ? 'var(--accent-orange)' : 'var(--accent-red)'
-                     }}>
-                      <Shield size={10} /> {item.risk} Risk
-                    </div>
+                    {(() => {
+                      const pred = mlEngine.predictMarket(item.symbol);
+                      const riskLevel = pred.trend === 'BEARISH' && item.risk === 'Low' ? 'Medium' : item.risk;
+                      return (
+                        <div style={{ 
+                          display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: '600',
+                          background: riskLevel === 'Low' ? 'rgba(0, 255, 195, 0.05)' : riskLevel === 'Medium' ? 'rgba(255, 157, 0, 0.05)' : 'rgba(255, 62, 94, 0.05)',
+                          color: riskLevel === 'Low' ? 'var(--accent-green)' : riskLevel === 'Medium' ? 'var(--accent-orange)' : 'var(--accent-red)'
+                        }}>
+                          <Shield size={10} /> {riskLevel} Risk
+                        </div>
+                      );
+                    })()}
                   </td>
                   <td style={{ padding: '16px 12px' }}>
                     <button className="ai-btn-secondary" style={{ padding: '6px 14px', fontSize: '11px' }}>

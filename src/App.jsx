@@ -15,6 +15,7 @@ import Portfolio from './pages/Portfolio.jsx';
 import Watchlist from './pages/Watchlist.jsx';
 import Profile from './pages/Profile.jsx';
 import SettingsPage from './pages/Settings.jsx';
+import { mlEngine } from './services/mlEngine';
 
 // Data Generation with Prediction
 const generateData = () => {
@@ -111,20 +112,33 @@ function AIControlPanel() {
 }
 
 function AIInsightsBox() {
+  const [insight, setInsight] = useState("Scanning markets for yield opportunities...");
+  const [metrics, setMetrics] = useState({ return: 0, risk: 0 });
+
+  useEffect(() => {
+    // Simulate ML insight generation
+    const mockPortfolio = { assets: [{ name: 'ETH', yield: '12.5%', risk: 'Low' }] };
+    setInsight(mlEngine.getInsight(mockPortfolio, 'BULLISH'));
+    setMetrics({ 
+      return: mlEngine.predictMarket('ETH').confidence / 50, 
+      risk: (Math.random() * 15 + 5).toFixed(0) 
+    });
+  }, []);
+
   return (
     <div className="ai-card glass-panel" style={{ marginBottom: '12px' }}>
       <div className="ai-card-title">
         <Info size={14} color="var(--accent-blue)" /> AI Insight
       </div>
       <div className="insight-text">
-        "ETH yield dropped by 3% in Spark Pool. Reallocating 15% of funds to USDC-EURO high-stability vaults to maintain target growth."
+        "{insight}"
       </div>
       <div style={{ display: 'flex', gap: '16px', marginTop: '4px' }}>
         <div className="impact-badge positive">
-          <TrendingUp size={12} /> +1.8% Expected Return
+          <TrendingUp size={12} /> +{metrics.return}% Expected Return
         </div>
         <div className="impact-badge positive">
-          <Shield size={12} /> -20% Risk Reduction
+          <Shield size={12} /> -{metrics.risk}% Risk Reduction
         </div>
       </div>
     </div>
@@ -132,6 +146,18 @@ function AIInsightsBox() {
 }
 
 function AIActionPanel({ onApply }) {
+  const [recommendation, setRecommendation] = useState({ from: 'XRP', to: 'USDT', reason: 'High volatility' });
+  // eslint-disable-next-line no-unused-vars
+  const [aiConfidence, setAiConfidence] = useState(94.2);
+
+  useEffect(() => {
+    const pred = mlEngine.predictMarket('XRP');
+    setAiConfidence(pred.confidence);
+    if (pred.trend === 'BEARISH') {
+      setRecommendation({ from: 'XRP', to: 'ETH', reason: 'Bearish divergence detected' });
+    }
+  }, []);
+
   return (
     <div className="ai-card glass-panel" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <div className="ai-card-title">
@@ -144,10 +170,10 @@ function AIActionPanel({ onApply }) {
             RECOMMENDATION
           </div>
           <div style={{ fontSize: '14px', fontWeight: '500', lineHeight: '1.5' }}>
-            Move 20% funds from <span style={{color: 'var(--accent-red)'}}>XRP</span> → <span style={{color: 'var(--accent-green)'}}>USDT</span>
+            Move funds from <span style={{color: 'var(--accent-red)'}}>{recommendation.from}</span> → <span style={{color: 'var(--accent-green)'}}>{recommendation.to}</span>
           </div>
           <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' }}>
-            Reason: High volatility detected in XRP/USD pair.
+            Reason: {recommendation.reason}
           </div>
         </div>
         
@@ -158,7 +184,7 @@ function AIActionPanel({ onApply }) {
       </div>
       
       <div style={{ fontSize: '11px', color: 'var(--text-muted)', textAlign: 'center', marginTop: 'auto' }}>
-        AI confidence: 94.2%
+        AI confidence: {aiConfidence}%
       </div>
     </div>
   );
@@ -196,7 +222,7 @@ function SmartMarketPanel() {
 // --- Main Pages ---
 
 function VaultDashboard() {
-  const [data, setData] = useState(generateData());
+  const [data] = useState(generateData());
   const [timeRange, setTimeRange] = useState('24H');
   const [toast, setToast] = useState(null);
 
@@ -376,7 +402,7 @@ function VaultDashboard() {
 }
 
 function AppShell() {
-  const [balance, setBalance] = useState(21340.50);
+  const [balance] = useState(21340.50);
 
   return (
     <div className="vault-shell">
