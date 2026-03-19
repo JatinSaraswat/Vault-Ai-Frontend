@@ -55,8 +55,11 @@ function Sidebar() {
 
   return (
     <aside className="sidebar glass-panel">
-      <div className="sidebar-logo">
-        <Brain size={24} color="white" />
+      <div className="sidebar-logo-container">
+        <div className="sidebar-logo">
+          <Brain size={24} color="white" />
+        </div>
+        <span className="sidebar-brand">VaultAI</span>
       </div>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '20px' }}>
         {navItems.map(item => (
@@ -64,14 +67,15 @@ function Sidebar() {
             key={item.path}
             className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
             onClick={() => navigate(item.path)}
-            title={item.label}
           >
-            <item.icon size={20} />
+            <item.icon size={24} />
+            <span className="nav-label">{item.label}</span>
           </div>
         ))}
       </div>
       <div className="nav-item">
-        <Bell size={20} />
+        <Bell size={24} />
+        <span className="nav-label">Notifications</span>
       </div>
     </aside>
   );
