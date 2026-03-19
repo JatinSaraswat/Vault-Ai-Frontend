@@ -49,8 +49,17 @@ VaultAI is designed to simplify complex financial management by putting an AI "A
 ## Getting Started
 
 ```bash
+# Install dependencies
 npm install
+
+# Start development server
 npm run dev
+
+# Run full CI/CD verification locally (Lint + Build + ML Test)
+npm run ci
+
+# Run specific ML logic tests
+npm run validate
 ```
 
 Open [http://localhost:5173](http://localhost:5173) in your browser.
