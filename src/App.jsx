@@ -89,11 +89,11 @@ function Sidebar() {
     <motion.aside 
       className="sidebar glass-panel"
       initial={false}
-      animate={{ width: isHovered ? 240 : 76 }}
+      animate={{ width: isHovered ? 260 : 76 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      style={{ overflow: 'hidden' }}
+      style={{ overflow: 'hidden', paddingLeft: isHovered ? '20px' : '14px' }}
     >
       <div className="sidebar-logo-container">
         <div className="sidebar-logo">

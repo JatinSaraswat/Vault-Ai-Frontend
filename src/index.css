@@ -77,11 +77,6 @@ h1, h2, h3, .brand {
   padding-left: 14px;
 }
 
-.sidebar:hover {
-  width: 240px;
-  padding-left: 20px;
-}
-
 .sidebar-logo-container {
   display: flex;
   align-items: center;
@@ -96,10 +91,7 @@ h1, h2, h3, .brand {
   color: var(--text-main);
   opacity: 0;
   white-space: nowrap;
-}
-
-.sidebar:hover .sidebar-brand {
-  opacity: 1;
+  pointer-events: none;
 }
 
 .sidebar-logo {
@@ -114,7 +106,7 @@ h1, h2, h3, .brand {
 }
 
 .nav-item {
-  width: calc(100% - 20px);
+  width: 212px;
   height: 48px;
   display: flex;
   align-items: center;
@@ -123,7 +115,6 @@ h1, h2, h3, .brand {
   color: var(--text-muted);
   cursor: pointer;
   gap: 16px;
-  overflow: hidden;
 }
 
 .nav-item svg {
@@ -135,10 +126,7 @@ h1, h2, h3, .brand {
   font-weight: 600;
   opacity: 0;
   white-space: nowrap;
-}
-
-.sidebar:hover .nav-label {
-  opacity: 1;
+  pointer-events: none;
 }
 
 .nav-item:hover {
