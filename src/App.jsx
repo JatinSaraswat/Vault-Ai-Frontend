@@ -131,13 +131,15 @@ function AIInsightsBox() {
     }, 0);
   }, []);
 
+  const explainAI = JSON.parse(localStorage.getItem('vaultai_explain_ai')) ?? true;
+
   return (
     <div className="ai-card glass-panel" style={{ marginBottom: '12px' }}>
       <div className="ai-card-title">
         <Info size={14} color="var(--accent-blue)" /> AI Insight
       </div>
       <div className="insight-text">
-        "{insight}"
+        {explainAI ? `"${insight}"` : "AI decision-making logs are currently hidden. Enable Explainability in Settings."}
       </div>
       <div style={{ display: 'flex', gap: '16px', marginTop: '4px' }}>
         <div className="impact-badge positive">
@@ -299,16 +301,18 @@ function VaultDashboard() {
                   />
                   
                   {/* Prediction Line */}
-                  <Area 
-                    type="monotone" 
-                    dataKey="uv" 
-                    data={data.filter((d, i) => i >= data.length - 11)}
-                    stroke="var(--accent-blue)" 
-                    strokeWidth={2}
-                    strokeDasharray="5 5"
-                    fill="none"
-                    isAnimationActive={false}
-                  />
+                  {JSON.parse(localStorage.getItem('vaultai_prediction_graph')) !== false && (
+                    <Area 
+                      type="monotone" 
+                      dataKey="uv" 
+                      data={data.filter((d, i) => i >= data.length - 11)}
+                      stroke="var(--accent-blue)" 
+                      strokeWidth={2}
+                      strokeDasharray="5 5"
+                      fill="none"
+                      isAnimationActive={false}
+                    />
+                  )}
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -375,13 +379,19 @@ function VaultDashboard() {
 
         <div className="glass-panel ai-card">
           <div className="ai-card-title">Risk Meter</div>
-          <div style={{ textAlign: 'center', padding: '10px 0', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <div style={{ fontSize: '32px', fontWeight: '700', color: 'var(--accent-blue)' }}>65<span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>/100</span></div>
-            <div style={{ color: 'var(--accent-orange)', fontWeight: '600', marginTop: '4px', letterSpacing: '1px' }}>MEDIUM RISK</div>
-            <div className="risk-meter-container" style={{ height: '12px', marginTop: '16px' }}>
-              <div className="risk-meter-fill" style={{ width: '65%', background: 'linear-gradient(90deg, var(--accent-green), var(--accent-orange))' }}></div>
+          {JSON.parse(localStorage.getItem('vaultai_risk_breakdown')) !== false ? (
+            <div style={{ textAlign: 'center', padding: '10px 0', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <div style={{ fontSize: '32px', fontWeight: '700', color: 'var(--accent-blue)' }}>65<span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>/100</span></div>
+              <div style={{ color: 'var(--accent-orange)', fontWeight: '600', marginTop: '4px', letterSpacing: '1px' }}>MEDIUM RISK</div>
+              <div className="risk-meter-container" style={{ height: '12px', marginTop: '16px' }}>
+                <div className="risk-meter-fill" style={{ width: '65%', background: 'linear-gradient(90deg, var(--accent-green), var(--accent-orange))' }}></div>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, color: 'var(--text-muted)', fontSize: '11px', textAlign: 'center', padding: '20px' }}>
+              Detailed risk metrics are disabled. Enable "Show Risk Breakdown" in Settings to view full analysis.
+            </div>
+          )}
         </div>
 
         <div className="glass-panel ai-card">
