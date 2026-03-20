@@ -62,6 +62,7 @@ export default function Portfolio() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
+                whileHover={{ scale: 1.03 }}
               >
                 <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{stat.label}</div>
                 <div style={{ fontSize: '20px', fontWeight: '700', margin: '4px 0' }}>{stat.val}</div>
@@ -71,7 +72,11 @@ export default function Portfolio() {
           </div>
 
           {/* Allocation Comparison */}
-          <div className="glass-panel ai-card">
+          <motion.div 
+            className="glass-panel ai-card"
+            whileHover={{ scale: 1.01 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          >
             <div className="ai-card-title">
               <Layers size={14} color="var(--accent-blue)" /> Core Allocation & AI Recommendations
             </div>
@@ -128,12 +133,15 @@ export default function Portfolio() {
                 </motion.div>
               ))}
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Right Info Panel */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <div className="glass-panel ai-card">
+          <motion.div 
+            className="glass-panel ai-card"
+            whileHover={{ scale: 1.02 }}
+          >
             <div className="ai-card-title">
               <Shield size={14} color="var(--accent-blue)" /> Risk Analysis
             </div>
@@ -147,7 +155,7 @@ export default function Portfolio() {
                 <div className="risk-meter-fill" style={{ width: `${analysis.riskScore}%`, background: 'linear-gradient(90deg, var(--accent-green) 0%, var(--accent-orange) 50%, var(--accent-red) 100%)' }}></div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           <div className="glass-panel ai-card" style={{ flex: 1 }}>
             <div className="ai-card-title">

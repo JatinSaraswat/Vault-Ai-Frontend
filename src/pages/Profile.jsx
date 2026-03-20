@@ -84,7 +84,11 @@ export default function Profile() {
           </motion.div>
 
           {/* Performance Chart */}
-          <div className="glass-panel ai-card" style={{ flex: 1 }}>
+          <motion.div 
+            className="glass-panel ai-card" 
+            style={{ flex: 1 }}
+            whileHover={{ scale: 1.01 }}
+          >
             <div className="ai-card-title">
               <TrendingUp size={14} color="var(--accent-green)" /> Monthly AI Yield Performance
             </div>
@@ -106,12 +110,15 @@ export default function Profile() {
                 </BarChart>
               </ResponsiveContainer>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* AI Stats Panel */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <div className="glass-panel ai-card">
+          <motion.div 
+            className="glass-panel ai-card"
+            whileHover={{ scale: 1.02 }}
+          >
             <div className="ai-card-title">
               <Brain size={14} color="var(--accent-blue)" /> System Trust Score
             </div>
@@ -132,9 +139,13 @@ export default function Profile() {
                 </div>
               );
             })()}
-          </div>
+          </motion.div>
 
-          <div className="glass-panel ai-card" style={{ flex: 1 }}>
+          <motion.div 
+            className="glass-panel ai-card" 
+            style={{ flex: 1 }}
+            whileHover={{ scale: 1.01 }}
+          >
             <div className="ai-card-title">
               <Award size={14} color="var(--accent-orange)" /> Achievement Log
             </div>
@@ -162,7 +173,7 @@ export default function Profile() {
                 </motion.div>
               ))}
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>

@@ -56,6 +56,7 @@ export default function SettingsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
+          whileHover={{ scale: 1.01 }}
         >
           <div className="ai-card-title">
             <Cpu size={14} color="var(--accent-blue)" /> Core Logic Engine
@@ -127,7 +128,10 @@ export default function SettingsPage() {
         </motion.div>
 
         {/* Security & Access */}
-        <div className="glass-panel ai-card">
+        <motion.div 
+          className="glass-panel ai-card"
+          whileHover={{ scale: 1.02 }}
+        >
           <div className="ai-card-title">
             <Shield size={14} color="var(--accent-green)" /> Security & Bio-Auth
           </div>
@@ -147,10 +151,13 @@ export default function SettingsPage() {
             ))}
             <button className="ai-btn-secondary" style={{ marginTop: '10px', width: '100%', fontSize: '12px', padding: '10px' }}>Change Access Password</button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Notifications */}
-        <div className="glass-panel ai-card">
+        <motion.div 
+          className="glass-panel ai-card"
+          whileHover={{ scale: 1.02 }}
+        >
           <div className="ai-card-title">
             <Bell size={14} color="var(--accent-orange)" /> Alert Configuration
           </div>
@@ -174,10 +181,14 @@ export default function SettingsPage() {
           <button className="ai-btn-secondary" style={{ marginTop: '20px', width: '100%', color: 'var(--accent-red)', border: '1px solid rgba(255, 62, 94, 0.2)' }}>
             <LogOut size={14} /> Terminate AI Session
           </button>
-        </div>
+        </motion.div>
 
         {/* AI Explainability Toggle (MARC BOOSTER) */}
-        <div className="glass-panel ai-card hover-glow" style={{ border: '1px solid rgba(0, 210, 255, 0.2)' }}>
+        <motion.div 
+          className="glass-panel ai-card hover-glow" 
+          style={{ border: '1px solid rgba(0, 210, 255, 0.2)' }}
+          whileHover={{ scale: 1.02 }}
+        >
           <div className="ai-card-title" style={{ color: 'var(--accent-blue)' }}>
             <Brain size={14} /> AI Explainability & Transparency
             <span style={{ marginLeft: 'auto', fontSize: '10px', background: 'rgba(0, 210, 255, 0.1)', padding: '2px 8px', borderRadius: '4px', border: '1px solid rgba(0, 210, 255, 0.2)' }}>PRO</span>
@@ -244,7 +255,7 @@ export default function SettingsPage() {
           }}>
             Transparency settings apply globally across your VaultAI dashboard interfaces.
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

@@ -41,8 +41,8 @@ export default function Watchlist() {
             style={{ padding: '20px', position: 'relative' }}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: index * 0.1 }}
-            whileHover={{ y: -5, boxShadow: "var(--neon-glow)" }}
+            transition={{ delay: index * 0.1, type: "spring", stiffness: 200 }}
+            whileHover={{ scale: 1.03 }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -122,7 +122,11 @@ export default function Watchlist() {
           </motion.div>
         ))}
         
-        <div className="glass-panel ai-card" style={{ padding: '20px', border: '2px dashed var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', minHeight: '300px' }}>
+        <motion.div 
+          className="glass-panel ai-card" 
+          style={{ padding: '20px', border: '2px dashed var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', minHeight: '300px' }}
+          whileHover={{ scale: 1.02 }}
+        >
           <div style={{ textAlign: 'center' }}>
             <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(0,210,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
               <Activity size={24} color="var(--accent-blue)" />
@@ -130,7 +134,7 @@ export default function Watchlist() {
             <div style={{ fontWeight: '700', fontSize: '14px' }}>Monitor New Asset</div>
             <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>AI will begin tracking sentiment</div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
