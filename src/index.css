@@ -309,6 +309,17 @@ h1, h2, h3, .brand {
   box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
 }
 
+.ai-btn-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  color: var(--text-main);
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
 .ai-btn-secondary:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: var(--accent-blue);
