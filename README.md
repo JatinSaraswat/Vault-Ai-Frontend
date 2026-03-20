@@ -1,74 +1,96 @@
-# VaultAI – AI-Powered Money Management
+# 💎 VaultAI: The Future of Portfolio Intelligence
 
-**T63-6th-sem-project**  
-*VaultAI is a premium, AI-driven wealth management platform transformed from a traditional trading dashboard. This project highlights advanced AI interventions, predictive analytics, and a state-of-the-art Neon Glassmorphism UI.*
+**VaultAI** is a premium, AI-driven wealth management platform that transforms traditional trading into a fully automated, high-fidelity financial experience. Far beyond a simple dashboard, VaultAI integrates **Predictive Analytics**, **Stochastic Modeling**, and a **Luxury Neon-Glassmorphism UI** to put capital management on auto-pilot.
 
 ---
 
-## 🤖 Overview
-VaultAI is designed to simplify complex financial management by putting an AI "Auto-Pilot" at the core of the user experience. Instead of manual trading, users interact with AI-driven rebalancing, risk-assessment flags, and narrative insights.
+## ✨ Premium UI & UX (Luxury Upgrade)
+VaultAI has been meticulously crafted to feel like a high-end fintech application:
+- **🌈 Luxury Gradients**: Vibrant 135° gradients (`#06b6d4` to `#3b82f6`) powering primary action buttons.
+- **🏮 Radiant Glows**: Subtle `0 0 20px` card shadows and interactive glows for a "top-tier" visual depth.
+- **✨ Framer Motion Integration**: Project-wide spring-physics animations (`scale: 1.03`) making every card and panel feel tactile and responsive.
+- **❄️ Neon Glassmorphism**: Frosted backdrop-filter blur effects on obsidian backgrounds with consistent 1px glass borders.
 
-## 🎨 Premium Aesthetics
-- **Neon Glassmorphism**: High-contrast neon blue and green accents on a deep obsidian background.
-- **Glass Panels**: Backdrop-filter blur effects with consistent 1px borders for a "frosted glass" look.
-- **Typography**: Inter for readability and Poppins for professional headings.
-- **Animations**: Real-time status pulses and smooth hover transitions.
+---
 
-## 🚀 Key Features
+## 🚀 Key Functional Modules
 
-### 🧠 AI Command Center (App Shell)
-- **AI Control Panel**: Displays system status (ACTIVE), current strategy (Balanced Growth), and risk tolerance at a glance.
-- **Dynamic Expanding Sidebar**: A state-of-the-art navigation shell that expands on hover to reveal labels and brand identity, while staying minimalist in its collapsed state.
-- **Explainability & Transparency**: A dedicated "PRO" configuration suite allowing users to toggle real-time logic reasoning, risk matrix breakdowns, and futuristic price overlays.
-- **Operation Mode Selector**: Toggle between **Simulation** and **Live Mode** (currently locked to Simulation for testing and safety validation).
+### 🧠 AI Command Center
+- **System Autopilot**: Displays real-time engine status (ACTIVE), strategy (Balanced Growth), and risk metrics.
+- **Dynamic AI Logic Engine**: A dedicated suite in Settings allowing users to toggle **Explainability Matrix**, **Transparency Overlays**, and **Risk-Adjusted Rebalancing**.
+- **Mode Selector**: Seamlessly switch between **Simulation** and **Live Mode** environments.
 
-### 📊 Predictive Dashboard
-- **AI Portfolio Chart**: Combines historical data with dashed **AI Prediction Lines** for future performance forecasting.
-- **AI Insights Box**: Real-time narrative explanations for why the AI is making specific capital movements.
-- **Action Panel**: Simple "Apply/Ignore" interface for AI-recommended rebalances.
-
-### 📈 Smart Portfolio Sector
-- **Allocation Targets**: Bars comparing current asset weight against AI-recommended targets.
-- **Dynamic Risk Meter**: A color-coded scale (0-100) reflecting real-time portfolio volatility.
-- **Activity Log**: Automated record of every AI intervention and optimization.
+### 📈 Predictive Dashboard
+- **Future Forecasting**: Interactive charts in `App.jsx` and `Portfolio.jsx` featuring dashed **AI Prediction Lines** for asset performance.
+- **Narrative Insights**: AI-generated text explaining the *reasoning* behind specific market movements and recommended trades.
+- **Actionable Rebalancing**: One-tap "Rebalance Now" button to align the portfolio with AI-optimized target weights.
 
 ### 🧭 Smart Market Explorer
-- **Yield & Risk Flags**: Markets are augmented with "AI Yield Est." and "Risk Assessment" indicators.
-- **Live Backend Integration**: Real-time market data is fetched directly from the backend API (`http://localhost:8080/api/markets`) ensuring current valuation and trend accuracy.
-- **Sentiment Monitor**: The Watchlist page acts as an AI asset monitor with bullish/bearish sentiment scores.
-
-## 🧠 Centralized ML Intelligence
-All "AI" features are powered by a custom-built **ML Intelligence Engine** (`src/services/mlEngine.js`). This service simulates real-world backend logic for:
-- **Aggregate Risk Analysis**: Calculation of portfolio-wide volatility scores.
-- **Market Sentiment Projection**: Real-time bullish/bearish forecasting for major assets.
-- **Allocation Optimization**: Algorithmic generation of target asset weights.
-
-## 🛠 Tech Stack
-- **Frontend**: React 19, Vite 8, React Router 7
-- **Visualization**: Recharts (with custom prediction overlays)
-- **Icons**: Lucide React
-- **Design**: Vanilla CSS with Glassmorphism Utilities
-
-## 📝 Project History
-- **Commits**: 50+ individual, descriptive commits for granular tracking and scoring.
-- **Verification**: Fully verified cross-page responsiveness and charting stability.
+- **Yield & Risk Scanning**: Every market asset is augmented with real-time "AI Yield Est." and "Risk Assessment" flags.
+- **Bullish/Bearish Sentiment**: The Watchlist page acts as an AI asset monitor with predictive sentiment scores.
+- **Live Lifecycle**: Real-time data fetching from the Node.js backend (`http://localhost:8080/api/markets`).
 
 ---
 
-## Getting Started
+## 🧠 Centralized ML Intelligence
+All "AI" behavior is governed by the core **ML Intelligence Engine** (`src/services/mlEngine.js`), simulating complex institutional grade analytics:
+- **Portfolio Volatility Modeling**: Calculating aggregate risk scores on a 0-100 scale.
+- **Target Weight Optimization**: Algorithmic generation of optimal asset distributions.
+- **Market Sentiment Projection**: Real-time confidence scores and trend forecasting for major assets.
 
+---
+
+## 🛠 Tech Stack & Dependencies
+- **Frontend Core**: React 19, Vite, React Router 7
+- **Motion & UI Logic**: Framer Motion (Spring Physics & Shared Layouts)
+- **Data Visualization**: Recharts (Customized with Predicted Area Overlays)
+- **Design System**: Vanilla CSS with Glassmorphism Design Tokens
+- **Icons**: Lucide React (Fintech Pack)
+
+---
+
+## 📦 Getting Started
+
+### 1. Installation
 ```bash
-# Install dependencies
+# Clone the repository
+git clone https://github.com/JatinSaraswat/Vault-Ai-Frontend.git
+
+# Navigate to the project directory
+cd Vault-AI
+
+# Install premium dependencies
 npm install
-
-# Start development server
-npm run dev
-
-# Run full CI/CD verification locally (Lint + Build + ML Test)
-npm run ci
-
-# Run specific ML logic tests
-npm run validate
 ```
 
-Open [http://localhost:5173](http://localhost:5173) in your browser.
+### 2. Run the Application
+```bash
+# Start the development server
+npm run dev
+
+# Run Build & Lint Verification
+npm run lint
+```
+
+### 3. Verification Commands
+```bash
+# Run ML Engine logic validation
+npm run validate
+
+# Run Full CI/CD Suite locally
+npm run ci
+```
+
+---
+
+## 📂 Project Architecture
+```text
+src/
+├── components/   # Modular UI elements (Sidebar, Charts, Cards)
+├── pages/        # Main route views (Markets, Portfolio, Settings, Profile)
+├── services/     # Centralized ML Logic Engine & API Integrations
+├── styles/       # Design System tokens & global layout CSS
+└── App.jsx       # Layout orchestrator & Framer Motion routing
+```
+
+**VaultAI** is built to showcase the intersection of **High-Fidelity Design** and **Actionable Financial Intelligence**.
