@@ -74,6 +74,8 @@ function PageWrapper({ children }) {
 function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isHovered, setIsHovered] = useState(false);
+  
   const navItems = [
     { icon: Home, path: '/', label: 'Vault' },
     { icon: List, path: '/markets', label: 'Markets' },
@@ -87,8 +89,9 @@ function Sidebar() {
     <motion.aside 
       className="sidebar glass-panel"
       initial={false}
-      animate={{ width: 76 }}
-      whileHover={{ width: 240 }}
+      animate={{ width: isHovered ? 240 : 76 }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       style={{ overflow: 'hidden' }}
     >
@@ -98,14 +101,13 @@ function Sidebar() {
         </div>
         <motion.span 
           className="sidebar-brand"
-          initial={{ opacity: 0 }}
-          whileHover={{ opacity: 1 }}
+          animate={{ opacity: isHovered ? 1 : 0 }}
           transition={{ duration: 0.2 }}
         >
           VaultAI
         </motion.span>
       </div>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '20px' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '20px' }}>
         {navItems.map(item => (
           <motion.div 
             key={item.path}
@@ -114,11 +116,11 @@ function Sidebar() {
             whileHover={{ x: 5, backgroundColor: "var(--bg-panel-hover)" }}
             whileTap={{ scale: 0.98 }}
           >
-            <item.icon size={24} />
+            <item.icon size={22} />
             <motion.span 
               className="nav-label"
-              initial={{ opacity: 0 }}
-              whileHover={{ opacity: 1 }}
+              animate={{ opacity: isHovered ? 1 : 0 }}
+              transition={{ duration: 0.2 }}
             >
               {item.label}
             </motion.span>
@@ -130,8 +132,14 @@ function Sidebar() {
         whileHover={{ x: 5, backgroundColor: "var(--bg-panel-hover)" }}
         whileTap={{ scale: 0.98 }}
       >
-        <Bell size={24} />
-        <motion.span className="nav-label">Notifications</motion.span>
+        <Bell size={22} />
+        <motion.span 
+          className="nav-label"
+          animate={{ opacity: isHovered ? 1 : 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          Notifications
+        </motion.span>
       </motion.div>
     </motion.aside>
   );
