@@ -94,3 +94,11 @@ src/
 ```
 
 **VaultAI** is built to showcase the intersection of **High-Fidelity Design** and **Actionable Financial Intelligence**.
+
+---
+
+## 📄 Documentation
+Explore the full documentation suite for deep-dives into our system:
+- [🏛️ Architecture](docs/ARCHITECTURE.md) - System design and data flow.
+- [🛡️ Policies](docs/POLICIES.md) - Security and contribution guidelines.
+- [📜 License](LICENSE) - MIT License details.
