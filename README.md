@@ -20,6 +20,7 @@ VaultAI is designed to simplify complex financial management by putting an AI "A
 - **AI Control Panel**: Displays system status (ACTIVE), current strategy (Balanced Growth), and risk tolerance at a glance.
 - **Dynamic Expanding Sidebar**: A state-of-the-art navigation shell that expands on hover to reveal labels and brand identity, while staying minimalist in its collapsed state.
 - **Explainability & Transparency**: A dedicated "PRO" configuration suite allowing users to toggle real-time logic reasoning, risk matrix breakdowns, and futuristic price overlays.
+- **Operation Mode Selector**: Toggle between **Simulation** and **Live Mode** (currently locked to Simulation for testing and safety validation).
 
 ### 📊 Predictive Dashboard
 - **AI Portfolio Chart**: Combines historical data with dashed **AI Prediction Lines** for future performance forecasting.
