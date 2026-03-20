@@ -9,6 +9,13 @@ import {
 } from 'recharts';
 
 import { mlEngine } from '../services/mlEngine';
+import { motion } from 'framer-motion';
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.5 }
+};
 
 const PORTFOLIO_DATA = [
   { name: 'BTC', value: 46.7, color: '#f59e0b', current: 9962.21, recommended: 50.0 },
@@ -48,11 +55,18 @@ export default function Portfolio() {
               { label: 'Risk Score', val: `${analysis.riskScore}/100`, sub: `${analysis.riskLevel} RISK`, col: analysis.riskScore > 60 ? 'var(--accent-orange)' : 'var(--accent-green)' },
               { label: 'Efficiency', val: '94%', sub: 'High Optimization', col: 'var(--accent-blue)' },
             ].map((stat, i) => (
-              <div key={i} className="glass-panel ai-card" style={{ padding: '16px' }}>
+              <motion.div 
+                key={i} 
+                className="glass-panel ai-card" 
+                style={{ padding: '16px' }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+              >
                 <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{stat.label}</div>
                 <div style={{ fontSize: '20px', fontWeight: '700', margin: '4px 0' }}>{stat.val}</div>
                 <div style={{ fontSize: '11px', color: stat.col }}>{stat.sub}</div>
-              </div>
+              </motion.div>
             ))}
           </div>
 
@@ -67,7 +81,15 @@ export default function Portfolio() {
                 <span>ASSET</span> <span>CURRENT WEIGHT</span> <span>AI TARGET</span>
               </div>
               {optimizedData.map((item, i) => (
-                <div key={i} className="smart-item" style={{ display: 'grid', gridTemplateColumns: '100px 1fr 1fr', cursor: 'default' }}>
+                <motion.div 
+                  key={i} 
+                  className="smart-item" 
+                  style={{ display: 'grid', gridTemplateColumns: '100px 1fr 1fr', cursor: 'default' }}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 + i * 0.05 }}
+                  whileHover={{ backgroundColor: "var(--bg-panel-hover)" }}
+                >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <div style={{ width: 8, height: 8, borderRadius: '2px', background: item.color }}></div>
                     <span style={{ fontWeight: '600' }}>{item.name}</span>
@@ -77,7 +99,13 @@ export default function Portfolio() {
                       <span>{item.value}%</span>
                     </div>
                     <div className="risk-meter-container" style={{ height: '4px' }}>
-                      <div className="risk-meter-fill" style={{ width: `${item.value}%`, background: item.color }}></div>
+                      <motion.div 
+                        className="risk-meter-fill" 
+                        initial={{ width: 0 }}
+                        animate={{ width: `${item.value}%` }}
+                        transition={{ duration: 1, ease: "easeOut" }}
+                        style={{ background: item.color }}
+                      ></motion.div>
                     </div>
                   </div>
                   <div style={{ paddingRight: '20px' }}>
@@ -88,10 +116,16 @@ export default function Portfolio() {
                         <span style={{color: 'var(--accent-red)'}}>Reduce</span>}
                     </div>
                     <div className="risk-meter-container" style={{ height: '4px', background: 'rgba(255,255,255,0.02)' }}>
-                      <div className="risk-meter-fill" style={{ width: `${item.recommended}%`, background: item.color, opacity: 0.4 }}></div>
+                      <motion.div 
+                        className="risk-meter-fill" 
+                        initial={{ width: 0 }}
+                        animate={{ width: `${item.recommended}%` }}
+                        transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
+                        style={{ background: item.color, opacity: 0.4 }}
+                      ></motion.div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>

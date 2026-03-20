@@ -4,6 +4,7 @@ import {
   Brain, Zap, Shield, Info, AlertTriangle, Activity
 } from 'lucide-react';
 import { mlEngine } from '../services/mlEngine';
+import { motion } from 'framer-motion';
 
 const WATCHLIST_DATA = [
   { id: 1, symbol: 'BTC', name: 'Bitcoin', price: '$41,509', sentiment: 'Bullish', sentimentScore: 82, trend: 'up' },
@@ -33,8 +34,16 @@ export default function Watchlist() {
       </div>
 
       <div className="content-row-full" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
-        {WATCHLIST_DATA.map(item => (
-          <div key={item.id} className="glass-panel ai-card hover-glow" style={{ padding: '20px', position: 'relative' }}>
+        {WATCHLIST_DATA.map((item, index) => (
+          <motion.div 
+            key={item.id} 
+            className="glass-panel ai-card hover-glow" 
+            style={{ padding: '20px', position: 'relative' }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: index * 0.1 }}
+            whileHover={{ y: -5, boxShadow: "var(--neon-glow)" }}
+          >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div className="sidebar-logo" style={{ width: 40, height: 40, borderRadius: '10px', background: 'rgba(255,255,255,0.05)', boxShadow: 'none' }}>
@@ -110,7 +119,7 @@ export default function Watchlist() {
               <button className="ai-btn-secondary" style={{ flex: 1, fontSize: '11px', padding: '10px' }}>Analyze</button>
               <button className="ai-btn-primary" style={{ flex: 1, fontSize: '11px', padding: '10px' }}>Setup Alert</button>
             </div>
-          </div>
+          </motion.div>
         ))}
         
         <div className="glass-panel ai-card" style={{ padding: '20px', border: '2px dashed var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', minHeight: '300px' }}>

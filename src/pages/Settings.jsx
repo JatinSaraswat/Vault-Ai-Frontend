@@ -3,6 +3,7 @@ import {
   Settings, Monitor, Bell, Shield, User, CreditCard, 
   Key, LogOut, Brain, Zap, Sliders, Info, Cpu, Activity, TrendingUp
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function SettingsPage() {
   const [autoPilot, setAutoPilot] = useState(true);
@@ -50,7 +51,12 @@ export default function SettingsPage() {
 
       <div className="content-row-full">
         {/* AI System Settings */}
-        <div className="glass-panel ai-card">
+        <motion.div 
+          className="glass-panel ai-card"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <div className="ai-card-title">
             <Cpu size={14} color="var(--accent-blue)" /> Core Logic Engine
           </div>
@@ -118,7 +124,7 @@ export default function SettingsPage() {
               </select>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Security & Access */}
         <div className="glass-panel ai-card">

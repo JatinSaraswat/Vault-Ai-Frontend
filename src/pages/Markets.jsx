@@ -4,6 +4,7 @@ import {
   Layers, AlertCircle, Zap, Star, ChevronRight, Activity, Shield
 } from 'lucide-react';
 import { mlEngine } from '../services/mlEngine';
+import { motion } from 'framer-motion';
 
 const MARKET_DATA = [
   { id: 1, symbol: 'BTC/USD', name: 'Bitcoin', price: 41509.23, change: '+2.41%', isPos: true, yield: '3.2%', risk: 'Low', category: 'Crypto' },
@@ -90,8 +91,16 @@ export default function Markets() {
               </tr>
             </thead>
             <tbody>
-              {filteredData.map(item => (
-                <tr key={item.id} className="smart-item" style={{ borderBottom: '1px solid var(--border)', cursor: 'default' }}>
+              {filteredData.map((item, index) => (
+                <motion.tr 
+                  key={item.id} 
+                  className="smart-item" 
+                  style={{ borderBottom: '1px solid var(--border)', cursor: 'default' }}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  whileHover={{ backgroundColor: "var(--bg-panel-hover)" }}
+                >
                   <td style={{ padding: '16px 12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <div className="sidebar-logo" style={{ width: 32, height: 32, fontSize: '12px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', boxShadow: 'none' }}>
@@ -142,7 +151,7 @@ export default function Markets() {
                       Monitor
                     </button>
                   </td>
-                </tr>
+                </motion.tr>
               ))}
             </tbody>
           </table>

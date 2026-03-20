@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { mlEngine } from '../services/mlEngine';
+import { motion } from 'framer-motion';
 
 const PERFORMANCE_DATA = [
   { month: 'Jan', pnl: 840 },
@@ -46,7 +47,13 @@ export default function Profile() {
       <div className="content-row">
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {/* User Info Card */}
-          <div className="glass-panel ai-card" style={{ padding: '24px' }}>
+          <motion.div 
+            className="glass-panel ai-card" 
+            style={{ padding: '24px' }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          >
             <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
               <div style={{ position: 'relative' }}>
                 <div style={{ width: 100, height: 100, borderRadius: '50%', background: 'var(--bg-panel-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--accent-blue)', boxShadow: 'var(--neon-glow)' }}>
@@ -74,7 +81,7 @@ export default function Profile() {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Performance Chart */}
           <div className="glass-panel ai-card" style={{ flex: 1 }}>
@@ -137,7 +144,14 @@ export default function Profile() {
                 { title: 'Risk Neutralizer', desc: 'Avoided 3 Market Crashes', date: 'Feb 2026', icon: Shield, col: 'var(--accent-blue)' },
                 { title: 'Vault Veteran', desc: '3 Months Active Status', date: 'Jan 2026', icon: CheckCircle, col: 'var(--accent-green)' },
               ].map((ach, i) => (
-                <div key={i} style={{ display: 'flex', gap: '12px', padding: '12px 0', borderBottom: '1px solid var(--border)' }}>
+                <motion.div 
+                  key={i} 
+                  style={{ display: 'flex', gap: '12px', padding: '12px 0', borderBottom: '1px solid var(--border)' }}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 + i * 0.1 }}
+                  whileHover={{ x: 5 }}
+                >
                   <div style={{ width: 32, height: 32, borderRadius: '8px', background: `${ach.col}10`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <ach.icon size={16} color={ach.col} />
                   </div>
@@ -145,7 +159,7 @@ export default function Profile() {
                     <div style={{ fontSize: '13px', fontWeight: '600' }}>{ach.title}</div>
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{ach.desc}</div>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>

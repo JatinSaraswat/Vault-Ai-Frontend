@@ -16,6 +16,7 @@ import Watchlist from './pages/Watchlist.jsx';
 import Profile from './pages/Profile.jsx';
 import SettingsPage from './pages/Settings.jsx';
 import { mlEngine } from './services/mlEngine';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Data Generation with Prediction
 const generateData = () => {
@@ -39,6 +40,35 @@ const generateData = () => {
   return base;
 };
 
+// --- Animation Variants ---
+const fadeInUp = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.5, ease: "easeOut" }
+};
+
+const pageVariants = {
+  initial: { opacity: 0, x: -10 },
+  animate: { opacity: 1, x: 0 },
+  exit: { opacity: 0, x: 10 },
+  transition: { duration: 0.3 }
+};
+
+function PageWrapper({ children }) {
+  return (
+    <motion.div
+      variants={pageVariants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      transition={pageVariants.transition}
+      style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 // --- Sub-components ---
 
 function Sidebar() {
@@ -54,30 +84,56 @@ function Sidebar() {
   ];
 
   return (
-    <aside className="sidebar glass-panel">
+    <motion.aside 
+      className="sidebar glass-panel"
+      initial={false}
+      animate={{ width: 76 }}
+      whileHover={{ width: 240 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      style={{ overflow: 'hidden' }}
+    >
       <div className="sidebar-logo-container">
         <div className="sidebar-logo">
           <Brain size={24} color="white" />
         </div>
-        <span className="sidebar-brand">VaultAI</span>
+        <motion.span 
+          className="sidebar-brand"
+          initial={{ opacity: 0 }}
+          whileHover={{ opacity: 1 }}
+          transition={{ duration: 0.2 }}
+        >
+          VaultAI
+        </motion.span>
       </div>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '20px' }}>
         {navItems.map(item => (
-          <div 
+          <motion.div 
             key={item.path}
             className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
             onClick={() => navigate(item.path)}
+            whileHover={{ x: 5, backgroundColor: "var(--bg-panel-hover)" }}
+            whileTap={{ scale: 0.98 }}
           >
             <item.icon size={24} />
-            <span className="nav-label">{item.label}</span>
-          </div>
+            <motion.span 
+              className="nav-label"
+              initial={{ opacity: 0 }}
+              whileHover={{ opacity: 1 }}
+            >
+              {item.label}
+            </motion.span>
+          </motion.div>
         ))}
       </div>
-      <div className="nav-item">
+      <motion.div 
+        className="nav-item"
+        whileHover={{ x: 5, backgroundColor: "var(--bg-panel-hover)" }}
+        whileTap={{ scale: 0.98 }}
+      >
         <Bell size={24} />
-        <span className="nav-label">Notifications</span>
-      </div>
-    </aside>
+        <motion.span className="nav-label">Notifications</motion.span>
+      </motion.div>
+    </motion.aside>
   );
 }
 
@@ -134,7 +190,11 @@ function AIInsightsBox() {
   const explainAI = JSON.parse(localStorage.getItem('vaultai_explain_ai')) ?? true;
 
   return (
-    <div className="ai-card glass-panel" style={{ marginBottom: '12px' }}>
+    <motion.div 
+      className="ai-card glass-panel" 
+      style={{ marginBottom: '12px' }}
+      {...fadeInUp}
+    >
       <div className="ai-card-title">
         <Info size={14} color="var(--accent-blue)" /> AI Insight
       </div>
@@ -149,7 +209,7 @@ function AIInsightsBox() {
           <Shield size={12} /> -{metrics.risk}% Risk Reduction
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -169,7 +229,12 @@ function AIActionPanel({ onApply }) {
   }, []);
 
   return (
-    <div className="ai-card glass-panel" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <motion.div 
+      className="ai-card glass-panel" 
+      style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+      {...fadeInUp}
+      transition={{ delay: 0.1, duration: 0.5 }}
+    >
       <div className="ai-card-title">
         <Zap size={14} color="var(--accent-orange)" /> AI Action Panel
       </div>
@@ -196,7 +261,7 @@ function AIActionPanel({ onApply }) {
       <div style={{ fontSize: '11px', color: 'var(--text-muted)', textAlign: 'center', marginTop: 'auto' }}>
         AI confidence: {aiConfidence}%
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -208,7 +273,12 @@ function SmartMarketPanel() {
   ];
 
   return (
-    <div className="ai-card glass-panel" style={{ flex: 1 }}>
+    <motion.div 
+      className="ai-card glass-panel" 
+      style={{ flex: 1 }}
+      {...fadeInUp}
+      transition={{ delay: 0.2, duration: 0.5 }}
+    >
       <div className="ai-card-title">
         <Activity size={14} color="var(--accent-green)" /> Smart Market Panel
       </div>
@@ -225,7 +295,7 @@ function SmartMarketPanel() {
           </div>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -243,15 +313,23 @@ function VaultDashboard() {
 
   return (
     <div className="main-content">
-      {toast && (
-        <div className="glass-panel" style={{ 
-          position: 'fixed', bottom: '24px', right: '24px', padding: '12px 24px', 
-          background: 'var(--accent-blue)', color: 'white', fontWeight: '700', 
-          borderRadius: '12px', boxShadow: '0 8px 32px rgba(0,210,255,0.4)', zIndex: 100 
-        }}>
-          {toast}
-        </div>
-      )}
+      <AnimatePresence>
+        {toast && (
+          <motion.div 
+            className="glass-panel" 
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 20 }}
+            style={{ 
+              position: 'fixed', bottom: '24px', right: '24px', padding: '12px 24px', 
+              background: 'var(--accent-blue)', color: 'white', fontWeight: '700', 
+              borderRadius: '12px', boxShadow: '0 8px 32px rgba(0,210,255,0.4)', zIndex: 100 
+            }}
+          >
+            {toast}
+          </motion.div>
+        )}
+      </AnimatePresence>
       
       <AIControlPanel />
       
@@ -445,14 +523,16 @@ function AppShell() {
           </div>
         </div>
         
-        <Routes>
-          <Route path="/" element={<VaultDashboard />} />
-          <Route path="/markets" element={<Markets />} />
-          <Route path="/portfolio" element={<Portfolio />} />
-          <Route path="/watchlist" element={<Watchlist />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/settings" element={<SettingsPage />} />
-        </Routes>
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<PageWrapper><VaultDashboard /></PageWrapper>} />
+            <Route path="/markets" element={<PageWrapper><Markets /></PageWrapper>} />
+            <Route path="/portfolio" element={<PageWrapper><Portfolio /></PageWrapper>} />
+            <Route path="/watchlist" element={<PageWrapper><Watchlist /></PageWrapper>} />
+            <Route path="/profile" element={<PageWrapper><Profile /></PageWrapper>} />
+            <Route path="/settings" element={<PageWrapper><SettingsPage /></PageWrapper>} />
+          </Routes>
+        </AnimatePresence>
       </div>
     </div>
   );
