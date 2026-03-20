@@ -56,6 +56,30 @@ export default function SettingsPage() {
           </div>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '10px' }}>
+            <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--border)' }}>
+              <div style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px', fontWeight: '700' }}>Operation Mode</div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <div style={{ 
+                  flex: 1, padding: '10px', borderRadius: '8px', background: 'rgba(0, 210, 255, 0.15)', 
+                  border: '1px solid var(--accent-blue)', color: 'white', fontSize: '11px', fontWeight: '700',
+                  textAlign: 'center', cursor: 'default', boxShadow: '0 0 15px rgba(0, 210, 255, 0.1)'
+                }}>
+                  SIMULATION
+                </div>
+                <div style={{ 
+                  flex: 1, padding: '10px', borderRadius: '8px', background: 'rgba(255, 255, 255, 0.03)', 
+                  border: '1px solid rgba(255, 255, 255, 0.05)', color: 'var(--text-muted)', fontSize: '11px', fontWeight: '700',
+                  textAlign: 'center', opacity: 0.4, cursor: 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px'
+                }}>
+                   LIVE MODE
+                </div>
+              </div>
+              <div style={{ fontSize: '10px', color: 'var(--accent-orange)', marginTop: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Info size={12} />
+                <span>Note: This system runs in simulated environment for testing.</span>
+              </div>
+            </div>
+
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <div style={{ fontSize: '14px', fontWeight: '600' }}>AI Auto-Pilot</div>
